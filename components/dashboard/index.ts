@@ -1,5 +1,7 @@
 export { AppShell } from "@/components/dashboard/app-shell";
+export { CategoryFilters } from "@/components/dashboard/category-filters";
 export { CategoryForm } from "@/components/dashboard/category-form";
+export { GoalFilters } from "@/components/dashboard/goal-filters";
 export { GoalForm } from "@/components/dashboard/goal-form";
 export { GoalsPanel } from "@/components/dashboard/goals-panel";
 export { CategoriesPanel } from "@/components/dashboard/categories-panel";
@@ -10,4 +12,5 @@ export { Sidebar } from "@/components/dashboard/sidebar";
 export { SummaryCard } from "@/components/dashboard/summary-card";
 export { TopBar } from "@/components/dashboard/top-bar";
 export { TransactionForm } from "@/components/dashboard/transaction-form";
+export { TransactionFilters } from "@/components/dashboard/transaction-filters";
 export { TransactionsList } from "@/components/dashboard/transactions-list";

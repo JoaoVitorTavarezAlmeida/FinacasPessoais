@@ -43,14 +43,14 @@ export function TopBar({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
           <button
             aria-label="Notificações"
-            className="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700"
+            className="hidden h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 sm:flex"
             type="button"
           >
             <BellIcon className="h-5 w-5" />
           </button>
 
-          <div className="flex items-center justify-between gap-3 rounded-2xl bg-slate-950 px-3 py-2 text-white sm:min-w-[260px]">
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-3 rounded-2xl bg-slate-950 px-3 py-3 text-white sm:min-w-[280px] sm:flex-row sm:items-center sm:justify-between sm:py-2">
+            <div className="flex min-w-0 items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-sm font-semibold">
                 {(userName ?? "VA")
                   .split(" ")
@@ -59,17 +59,21 @@ export function TopBar({
                   .slice(0, 2)
                   .toUpperCase()}
               </div>
-              <div className="pr-1">
+              <div className="min-w-0 pr-1">
                 <p className="text-sm font-medium">
                   {userName ?? "Modo demonstracao"}
                 </p>
-                <p className="text-xs text-white/60">
+                <p className="truncate text-xs text-white/60">
                   {userEmail ?? "Planejamento mensal"}
                 </p>
               </div>
             </div>
 
-            {userName ? <SignOutButton /> : null}
+            {userName ? (
+              <div className="w-full sm:w-auto sm:shrink-0">
+                <SignOutButton />
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

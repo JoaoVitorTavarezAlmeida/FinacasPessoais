@@ -1,13 +1,20 @@
 import { redirect } from "next/navigation";
 
-import { AppShell, GoalForm, GoalsPanel } from "@/components/dashboard";
+import { AppShell, GoalFilters, GoalForm, GoalsPanel } from "@/components/dashboard";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getDashboardData } from "@/lib/dashboard/get-dashboard-data";
 import { hasDatabaseUrl } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
-export default async function GoalsPage() {
+type GoalsPageProps = {
+  searchParams: Promise<{
+    q?: string;
+    progress?: string;
+  }>;
+};
+
+export default async function GoalsPage({ searchParams }: GoalsPageProps) {
   if (!hasDatabaseUrl()) {
     redirect("/dashboard");
   }
@@ -19,6 +26,29 @@ export default async function GoalsPage() {
   }
 
   const { goals } = await getDashboardData(currentUser.id);
+  const filters = await searchParams;
+  const search = filters.q?.trim().toLowerCase() ?? "";
+  const selectedProgress = filters.progress ?? "";
+  const filteredGoals = goals.filter((goal) =>
+    [
+      search ? goal.name.toLowerCase().includes(search) : true,
+      selectedProgress === "attention"
+        ? goal.progress < 40
+        : selectedProgress === "active"
+          ? goal.progress >= 40 && goal.progress < 80
+          : selectedProgress === "strong"
+            ? goal.progress >= 80
+            : selectedProgress === "completed"
+              ? goal.progress >= 100
+              : true,
+    ].every(Boolean),
+  );
+  const averageProgress = filteredGoals.length
+    ? Math.round(
+        filteredGoals.reduce((total, goal) => total + goal.progress, 0) /
+          filteredGoals.length,
+      )
+    : 0;
 
   return (
     <AppShell
@@ -27,8 +57,40 @@ export default async function GoalsPage() {
       title="Planejamento financeiro"
       user={currentUser}
     >
+      <section className="grid gap-4 md:grid-cols-3">
+        <article className="rounded-[26px] border border-white/70 bg-white/84 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] backdrop-blur">
+          <p className="text-sm text-slate-500">Metas filtradas</p>
+          <p className="mt-3 text-3xl font-semibold text-slate-950">
+            {filteredGoals.length}
+          </p>
+        </article>
+        <article className="rounded-[26px] border border-white/70 bg-white/84 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] backdrop-blur">
+          <p className="text-sm text-slate-500">Progresso médio</p>
+          <p className="mt-3 text-3xl font-semibold text-teal-700">
+            {averageProgress}%
+          </p>
+        </article>
+        <article className="rounded-[26px] border border-white/70 bg-white/84 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] backdrop-blur">
+          <p className="text-sm text-slate-500">Metas acima de 70%</p>
+          <p className="mt-3 text-3xl font-semibold text-emerald-600">
+            {filteredGoals.filter((goal) => goal.progress >= 80).length}
+          </p>
+        </article>
+      </section>
+
+      <GoalFilters search={filters.q} selectedProgress={selectedProgress} />
+
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
-        <GoalsPanel goals={goals} />
+        <GoalsPanel
+          action={
+            <span className="rounded-2xl bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
+              {filteredGoals.length} itens
+            </span>
+          }
+          eyebrow="Resultado"
+          goals={filteredGoals}
+          title="Metas encontradas"
+        />
         <GoalForm />
       </section>
     </AppShell>
