@@ -1,6 +1,7 @@
 import type {
   AuthFormState,
   CategoryFormState,
+  GoalFormState,
   TransactionFormState,
 } from "@/types/dashboard";
 
@@ -15,6 +16,11 @@ export const initialTransactionFormState: TransactionFormState = {
 };
 
 export const initialAuthFormState: AuthFormState = {
+  errors: {},
+  success: false,
+};
+
+export const initialGoalFormState: GoalFormState = {
   errors: {},
   success: false,
 };

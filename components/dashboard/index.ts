@@ -1,4 +1,6 @@
 export { CategoryForm } from "@/components/dashboard/category-form";
+export { GoalForm } from "@/components/dashboard/goal-form";
+export { GoalsPanel } from "@/components/dashboard/goals-panel";
 export { CategoriesPanel } from "@/components/dashboard/categories-panel";
 export { HistoryChart } from "@/components/dashboard/history-chart";
 export { MobileNav } from "@/components/dashboard/mobile-nav";

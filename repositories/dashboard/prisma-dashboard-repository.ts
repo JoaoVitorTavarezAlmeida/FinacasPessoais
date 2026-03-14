@@ -5,11 +5,15 @@ import type { DashboardRepository } from "@/repositories/dashboard/dashboard-rep
 import type {
   Category,
   CreateCategoryInput,
+  CreateGoalInput,
   CreateTransactionInput,
   DashboardData,
+  Goal,
   HistoryPoint,
   SummaryCardData,
   Transaction,
+  UpdateCategoryInput,
+  UpdateGoalInput,
   UpdateTransactionInput,
 } from "@/types/dashboard";
 
@@ -126,7 +130,7 @@ export const prismaDashboardRepository: DashboardRepository = {
     const previous30DaysStart = new Date(last30DaysStart);
     previous30DaysStart.setDate(last30DaysStart.getDate() - 30);
 
-    const [categoriesRaw, latestTransactions, monthTransactions, previousTransactions, goals] =
+    const [categoriesRaw, latestTransactions, monthTransactions, previousTransactions, goalsRaw] =
       await Promise.all([
         db.category.findMany({
           where: { userId },
@@ -158,6 +162,7 @@ export const prismaDashboardRepository: DashboardRepository = {
         }),
         db.goal.findMany({
           where: { userId },
+          orderBy: { createdAt: "desc" },
         }),
       ]);
 
@@ -213,13 +218,30 @@ export const prismaDashboardRepository: DashboardRepository = {
       .filter((transaction) => transaction.type === "EXPENSE")
       .reduce((total, transaction) => total + Number(transaction.amount), 0);
 
-    const goalsProgress = goals.length
-      ? goals.reduce((total, goal) => {
+    const goalsProgress = goalsRaw.length
+      ? goalsRaw.reduce((total, goal) => {
           const target = Number(goal.target);
           const current = Number(goal.current);
           return total + (target > 0 ? (current / target) * 100 : 0);
-        }, 0) / goals.length
+        }, 0) / goalsRaw.length
       : 0;
+
+    const goals: Goal[] = goalsRaw.map((goal) => {
+      const target = Number(goal.target);
+      const current = Number(goal.current);
+      const progress = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
+
+      return {
+        id: goal.id,
+        name: goal.name,
+        target: formatCurrency(target),
+        current: formatCurrency(current),
+        progress,
+        deadline: goal.deadline
+          ? goal.deadline.toISOString().slice(0, 10)
+          : undefined,
+      };
+    });
 
     return {
       summaryCards: buildSummaryCards({
@@ -232,6 +254,7 @@ export const prismaDashboardRepository: DashboardRepository = {
       history: buildHistoryPoints(totalsByDay, now),
       transactions,
       categories,
+      goals,
     };
   },
 
@@ -244,6 +267,34 @@ export const prismaDashboardRepository: DashboardRepository = {
         description: input.description,
         color: input.color,
         monthlyLimit: new Prisma.Decimal(parseCurrencyInput(input.limit)),
+        userId,
+      },
+    });
+  },
+
+  async updateCategory(input: UpdateCategoryInput, userId: string): Promise<void> {
+    const db = getDb();
+
+    await db.category.updateMany({
+      where: {
+        id: input.id,
+        userId,
+      },
+      data: {
+        name: input.name,
+        description: input.description,
+        color: input.color,
+        monthlyLimit: new Prisma.Decimal(parseCurrencyInput(input.limit)),
+      },
+    });
+  },
+
+  async deleteCategory(id: string, userId: string): Promise<void> {
+    const db = getDb();
+
+    await db.category.deleteMany({
+      where: {
+        id,
         userId,
       },
     });
@@ -292,6 +343,48 @@ export const prismaDashboardRepository: DashboardRepository = {
     const db = getDb();
 
     await db.transaction.deleteMany({
+      where: {
+        id,
+        userId,
+      },
+    });
+  },
+
+  async createGoal(input: CreateGoalInput, userId: string): Promise<void> {
+    const db = getDb();
+
+    await db.goal.create({
+      data: {
+        name: input.name,
+        target: new Prisma.Decimal(parseCurrencyInput(input.target)),
+        current: new Prisma.Decimal(parseCurrencyInput(input.current)),
+        deadline: input.deadline ? new Date(input.deadline) : null,
+        userId,
+      },
+    });
+  },
+
+  async updateGoal(input: UpdateGoalInput, userId: string): Promise<void> {
+    const db = getDb();
+
+    await db.goal.updateMany({
+      where: {
+        id: input.id,
+        userId,
+      },
+      data: {
+        name: input.name,
+        target: new Prisma.Decimal(parseCurrencyInput(input.target)),
+        current: new Prisma.Decimal(parseCurrencyInput(input.current)),
+        deadline: input.deadline ? new Date(input.deadline) : null,
+      },
+    });
+  },
+
+  async deleteGoal(id: string, userId: string): Promise<void> {
+    const db = getDb();
+
+    await db.goal.deleteMany({
       where: {
         id,
         userId,

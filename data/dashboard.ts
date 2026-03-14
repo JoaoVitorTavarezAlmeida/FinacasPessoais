@@ -1,6 +1,7 @@
 import type {
   Category,
   DashboardData,
+  Goal,
   HistoryPoint,
   SummaryCardData,
   Transaction,
@@ -144,9 +145,29 @@ export const categories: Category[] = [
   },
 ];
 
+export const goals: Goal[] = [
+  {
+    id: "reserve",
+    name: "Reserva de emergencia",
+    target: "R$ 15.000",
+    current: "R$ 10.950",
+    progress: 73,
+    deadline: "2026-12-12",
+  },
+  {
+    id: "trip",
+    name: "Viagem de ferias",
+    target: "R$ 6.000",
+    current: "R$ 3.200",
+    progress: 53,
+    deadline: "2027-01-18",
+  },
+];
+
 export const dashboardMockData: DashboardData = {
   summaryCards,
   history,
   transactions,
   categories,
+  goals,
 };

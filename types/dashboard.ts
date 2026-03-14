@@ -34,11 +34,21 @@ export type Category = {
   color: string;
 };
 
+export type Goal = {
+  id: string;
+  name: string;
+  target: string;
+  current: string;
+  progress: number;
+  deadline?: string;
+};
+
 export type DashboardData = {
   summaryCards: SummaryCardData[];
   history: HistoryPoint[];
   transactions: Transaction[];
   categories: Category[];
+  goals: Goal[];
 };
 
 export type AuthenticatedUser = {
@@ -54,6 +64,10 @@ export type CreateCategoryInput = {
   color: string;
 };
 
+export type UpdateCategoryInput = CreateCategoryInput & {
+  id: string;
+};
+
 export type CreateTransactionInput = {
   title: string;
   amount: string;
@@ -66,8 +80,19 @@ export type UpdateTransactionInput = CreateTransactionInput & {
   id: string;
 };
 
+export type CreateGoalInput = {
+  name: string;
+  target: string;
+  current: string;
+  deadline: string;
+};
+
+export type UpdateGoalInput = CreateGoalInput & {
+  id: string;
+};
+
 export type CategoryFormErrors = Partial<
-  Record<keyof CreateCategoryInput, string[]>
+  Record<keyof UpdateCategoryInput, string[]>
 >;
 
 export type CategoryFormState = {
@@ -82,6 +107,14 @@ export type TransactionFormErrors = Partial<
 
 export type TransactionFormState = {
   errors: TransactionFormErrors;
+  message?: string;
+  success: boolean;
+};
+
+export type GoalFormErrors = Partial<Record<keyof UpdateGoalInput, string[]>>;
+
+export type GoalFormState = {
+  errors: GoalFormErrors;
   message?: string;
   success: boolean;
 };

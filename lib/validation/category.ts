@@ -17,3 +17,7 @@ export const createCategorySchema = z.object({
 });
 
 export type CreateCategorySchemaInput = z.infer<typeof createCategorySchema>;
+
+export const updateCategorySchema = createCategorySchema.extend({
+  id: z.string().trim().min(1, "Categoria invalida."),
+});

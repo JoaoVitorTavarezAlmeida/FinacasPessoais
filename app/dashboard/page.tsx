@@ -35,6 +35,8 @@ export default async function DashboardPage() {
     const {
       CategoryForm,
       CategoriesPanel,
+      GoalForm,
+      GoalsPanel,
       HistoryChart,
       MobileNav,
       Sidebar,
@@ -44,7 +46,7 @@ export default async function DashboardPage() {
       TransactionsList,
     } = await import("@/components/dashboard");
 
-    const { categories, history, summaryCards, transactions } =
+    const { categories, goals, history, summaryCards, transactions } =
       await getDashboardData(currentUser.id);
 
     return (
@@ -79,6 +81,11 @@ export default async function DashboardPage() {
               <section className="grid gap-4">
                 <CategoryForm />
               </section>
+
+              <section className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
+                <GoalsPanel goals={goals} />
+                <GoalForm />
+              </section>
             </div>
           </div>
         </div>
@@ -89,6 +96,8 @@ export default async function DashboardPage() {
   const {
     CategoryForm,
     CategoriesPanel,
+    GoalForm,
+    GoalsPanel,
     HistoryChart,
     MobileNav,
     Sidebar,
@@ -98,7 +107,7 @@ export default async function DashboardPage() {
     TransactionsList,
   } = await import("@/components/dashboard");
 
-  const { categories, history, summaryCards, transactions } =
+  const { categories, goals, history, summaryCards, transactions } =
     await getDashboardData("mock-user");
 
   return (
@@ -132,6 +141,11 @@ export default async function DashboardPage() {
 
             <section className="grid gap-4">
               <CategoryForm />
+            </section>
+
+            <section className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
+              <GoalsPanel goals={goals} />
+              <GoalForm />
             </section>
           </div>
         </div>
