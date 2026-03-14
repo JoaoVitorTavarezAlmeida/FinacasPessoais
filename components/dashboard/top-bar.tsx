@@ -1,6 +1,13 @@
 import { BellIcon, SearchIcon } from "@/components/dashboard/icons";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 
-export function TopBar() {
+export function TopBar({
+  userName,
+  userEmail,
+}: {
+  userName?: string;
+  userEmail?: string;
+}) {
   return (
     <header className="flex flex-col gap-4 rounded-[28px] border border-white/65 bg-white/78 p-4 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur md:flex-row md:items-center md:justify-between md:p-5">
       <div>
@@ -32,13 +39,24 @@ export function TopBar() {
 
         <div className="flex items-center gap-3 rounded-2xl bg-slate-950 px-3 py-2 text-white">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-sm font-semibold">
-            VA
+            {(userName ?? "VA")
+              .split(" ")
+              .map((part) => part[0])
+              .join("")
+              .slice(0, 2)
+              .toUpperCase()}
           </div>
           <div className="pr-1">
-            <p className="text-sm font-medium">Vitória Almeida</p>
-            <p className="text-xs text-white/60">Planejamento mensal</p>
+            <p className="text-sm font-medium">
+              {userName ?? "Modo demonstracao"}
+            </p>
+            <p className="text-xs text-white/60">
+              {userEmail ?? "Planejamento mensal"}
+            </p>
           </div>
         </div>
+
+        {userName ? <SignOutButton /> : null}
       </div>
     </header>
   );

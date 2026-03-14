@@ -10,9 +10,11 @@ model User {
   id           String        @id @default(cuid())
   name         String
   email        String        @unique
+  passwordHash String?
   categories   Category[]
   transactions Transaction[]
   goals        Goal[]
+  sessions     Session[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 }
@@ -60,6 +62,17 @@ model Goal {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 
   @@index([userId])
 }

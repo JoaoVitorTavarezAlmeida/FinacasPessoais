@@ -1,6 +1,11 @@
 import { dashboardMockData } from "@/data/dashboard";
 import type { DashboardRepository } from "@/repositories/dashboard/dashboard-repository";
-import type { CreateCategoryInput, DashboardData } from "@/types/dashboard";
+import type {
+  CreateCategoryInput,
+  CreateTransactionInput,
+  DashboardData,
+  UpdateTransactionInput,
+} from "@/types/dashboard";
 
 function cloneDashboardData(data: DashboardData): DashboardData {
   return {
@@ -12,12 +17,32 @@ function cloneDashboardData(data: DashboardData): DashboardData {
 }
 
 export const mockDashboardRepository: DashboardRepository = {
-  async getDashboardData() {
+  async getDashboardData(userId: string) {
+    void userId;
     return cloneDashboardData(dashboardMockData);
   },
 
-  async createCategory(input: CreateCategoryInput) {
+  async createCategory(input: CreateCategoryInput, userId: string) {
     void input;
+    void userId;
+    return Promise.resolve();
+  },
+
+  async createTransaction(input: CreateTransactionInput, userId: string) {
+    void input;
+    void userId;
+    return Promise.resolve();
+  },
+
+  async updateTransaction(input: UpdateTransactionInput, userId: string) {
+    void input;
+    void userId;
+    return Promise.resolve();
+  },
+
+  async deleteTransaction(id: string, userId: string) {
+    void id;
+    void userId;
     return Promise.resolve();
   },
 };

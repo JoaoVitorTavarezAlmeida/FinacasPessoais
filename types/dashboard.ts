@@ -19,7 +19,9 @@ export type Transaction = {
   id: string;
   title: string;
   category: string;
+  categoryId?: string;
   date: string;
+  occurredAt?: string;
   amount: string;
   type: TransactionType;
 };
@@ -39,11 +41,29 @@ export type DashboardData = {
   categories: Category[];
 };
 
+export type AuthenticatedUser = {
+  id: string;
+  name: string;
+  email: string;
+};
+
 export type CreateCategoryInput = {
   name: string;
   description: string;
   limit: string;
   color: string;
+};
+
+export type CreateTransactionInput = {
+  title: string;
+  amount: string;
+  type: TransactionType;
+  categoryId: string;
+  occurredAt: string;
+};
+
+export type UpdateTransactionInput = CreateTransactionInput & {
+  id: string;
 };
 
 export type CategoryFormErrors = Partial<
@@ -52,6 +72,32 @@ export type CategoryFormErrors = Partial<
 
 export type CategoryFormState = {
   errors: CategoryFormErrors;
+  message?: string;
+  success: boolean;
+};
+
+export type TransactionFormErrors = Partial<
+  Record<keyof UpdateTransactionInput, string[]>
+>;
+
+export type TransactionFormState = {
+  errors: TransactionFormErrors;
+  message?: string;
+  success: boolean;
+};
+
+export type AuthMode = "sign-in" | "sign-up";
+
+export type AuthInput = {
+  name?: string;
+  email: string;
+  password: string;
+};
+
+export type AuthFormErrors = Partial<Record<keyof AuthInput, string[]>>;
+
+export type AuthFormState = {
+  errors: AuthFormErrors;
   message?: string;
   success: boolean;
 };

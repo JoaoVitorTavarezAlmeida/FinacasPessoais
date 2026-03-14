@@ -5,4 +5,5 @@ export { MobileNav } from "@/components/dashboard/mobile-nav";
 export { Sidebar } from "@/components/dashboard/sidebar";
 export { SummaryCard } from "@/components/dashboard/summary-card";
 export { TopBar } from "@/components/dashboard/top-bar";
+export { TransactionForm } from "@/components/dashboard/transaction-form";
 export { TransactionsList } from "@/components/dashboard/transactions-list";

@@ -1,9 +1,12 @@
-import type { Transaction } from "@/types/dashboard";
+import type { Category, Transaction } from "@/types/dashboard";
+import { TransactionListItem } from "@/components/dashboard/transaction-list-item";
 
 export function TransactionsList({
   transactions,
+  categories,
 }: {
   transactions: Transaction[];
+  categories: Category[];
 }) {
   return (
     <section className="rounded-[30px] border border-white/70 bg-white/84 p-5 shadow-[0_24px_60px_rgba(15,23,42,0.08)] backdrop-blur md:p-6">
@@ -26,29 +29,11 @@ export function TransactionsList({
 
       <div className="mt-6 space-y-3">
         {transactions.map((transaction) => (
-          <article
+          <TransactionListItem
             key={transaction.id}
-            className="flex items-center justify-between gap-4 rounded-[24px] border border-slate-100 bg-slate-50/80 p-4"
-          >
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-slate-900">
-                {transaction.title}
-              </p>
-              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
-                <span>{transaction.category}</span>
-                <span>{transaction.date}</span>
-              </div>
-            </div>
-            <p
-              className={`shrink-0 text-sm font-semibold ${
-                transaction.type === "income"
-                  ? "text-emerald-600"
-                  : "text-rose-600"
-              }`}
-            >
-              {transaction.amount}
-            </p>
-          </article>
+            categories={categories}
+            transaction={transaction}
+          />
         ))}
       </div>
     </section>

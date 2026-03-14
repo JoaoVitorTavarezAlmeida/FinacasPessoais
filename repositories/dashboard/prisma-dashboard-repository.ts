@@ -1,15 +1,16 @@
 import { Prisma } from "@prisma/client";
 
 import { getDb } from "@/lib/db";
-import { getAppUserId } from "@/lib/env";
 import type { DashboardRepository } from "@/repositories/dashboard/dashboard-repository";
 import type {
   Category,
   CreateCategoryInput,
+  CreateTransactionInput,
   DashboardData,
   HistoryPoint,
   SummaryCardData,
   Transaction,
+  UpdateTransactionInput,
 } from "@/types/dashboard";
 
 function formatCurrency(value: number) {
@@ -115,9 +116,8 @@ function buildSummaryCards({
 }
 
 export const prismaDashboardRepository: DashboardRepository = {
-  async getDashboardData(): Promise<DashboardData> {
+  async getDashboardData(userId: string): Promise<DashboardData> {
     const db = getDb();
-    const userId = getAppUserId();
     const now = new Date();
     const last30DaysStart = new Date(now);
     last30DaysStart.setDate(now.getDate() - 29);
@@ -181,7 +181,9 @@ export const prismaDashboardRepository: DashboardRepository = {
         id: transaction.id,
         title: transaction.title,
         category: transaction.category?.name ?? "Sem categoria",
+        categoryId: transaction.categoryId ?? undefined,
         date: formatTransactionDate(transaction.occurredAt),
+        occurredAt: transaction.occurredAt.toISOString().slice(0, 10),
         amount: signedAmount,
         type: transaction.type === "INCOME" ? "income" : "expense",
       };
@@ -233,19 +235,8 @@ export const prismaDashboardRepository: DashboardRepository = {
     };
   },
 
-  async createCategory(input: CreateCategoryInput): Promise<void> {
+  async createCategory(input: CreateCategoryInput, userId: string): Promise<void> {
     const db = getDb();
-    const userId = getAppUserId();
-
-    await db.user.upsert({
-      where: { id: userId },
-      update: {},
-      create: {
-        id: userId,
-        name: "Usuario Inicial",
-        email: `${userId}@local.test`,
-      },
-    });
 
     await db.category.create({
       data: {
@@ -253,6 +244,56 @@ export const prismaDashboardRepository: DashboardRepository = {
         description: input.description,
         color: input.color,
         monthlyLimit: new Prisma.Decimal(parseCurrencyInput(input.limit)),
+        userId,
+      },
+    });
+  },
+
+  async createTransaction(
+    input: CreateTransactionInput,
+    userId: string,
+  ): Promise<void> {
+    const db = getDb();
+
+    await db.transaction.create({
+      data: {
+        title: input.title,
+        amount: new Prisma.Decimal(parseCurrencyInput(input.amount)),
+        type: input.type === "income" ? "INCOME" : "EXPENSE",
+        categoryId: input.categoryId,
+        occurredAt: new Date(input.occurredAt),
+        userId,
+      },
+    });
+  },
+
+  async updateTransaction(
+    input: UpdateTransactionInput,
+    userId: string,
+  ): Promise<void> {
+    const db = getDb();
+
+    await db.transaction.updateMany({
+      where: {
+        id: input.id,
+        userId,
+      },
+      data: {
+        title: input.title,
+        amount: new Prisma.Decimal(parseCurrencyInput(input.amount)),
+        type: input.type === "income" ? "INCOME" : "EXPENSE",
+        categoryId: input.categoryId,
+        occurredAt: new Date(input.occurredAt),
+      },
+    });
+  },
+
+  async deleteTransaction(id: string, userId: string): Promise<void> {
+    const db = getDb();
+
+    await db.transaction.deleteMany({
+      where: {
+        id,
         userId,
       },
     });

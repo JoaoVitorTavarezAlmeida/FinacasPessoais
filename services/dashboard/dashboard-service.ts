@@ -3,11 +3,25 @@ import {
   prismaDashboardRepository,
 } from "@/repositories/dashboard";
 import { hasDatabaseUrl } from "@/lib/env";
-import type { CreateCategoryInput, DashboardData } from "@/types/dashboard";
+import type {
+  CreateCategoryInput,
+  CreateTransactionInput,
+  DashboardData,
+  UpdateTransactionInput,
+} from "@/types/dashboard";
 
 export type DashboardService = {
-  getDashboardData(): Promise<DashboardData>;
-  createCategory(input: CreateCategoryInput): Promise<void>;
+  getDashboardData(userId: string): Promise<DashboardData>;
+  createCategory(input: CreateCategoryInput, userId: string): Promise<void>;
+  createTransaction(
+    input: CreateTransactionInput,
+    userId: string,
+  ): Promise<void>;
+  updateTransaction(
+    input: UpdateTransactionInput,
+    userId: string,
+  ): Promise<void>;
+  deleteTransaction(id: string, userId: string): Promise<void>;
 };
 
 const dashboardRepository = hasDatabaseUrl()
@@ -15,11 +29,23 @@ const dashboardRepository = hasDatabaseUrl()
   : mockDashboardRepository;
 
 export const mockDashboardService: DashboardService = {
-  async getDashboardData() {
-    return dashboardRepository.getDashboardData();
+  async getDashboardData(userId) {
+    return dashboardRepository.getDashboardData(userId);
   },
 
-  async createCategory(input) {
-    return dashboardRepository.createCategory(input);
+  async createCategory(input, userId) {
+    return dashboardRepository.createCategory(input, userId);
+  },
+
+  async createTransaction(input, userId) {
+    return dashboardRepository.createTransaction(input, userId);
+  },
+
+  async updateTransaction(input, userId) {
+    return dashboardRepository.updateTransaction(input, userId);
+  },
+
+  async deleteTransaction(id, userId) {
+    return dashboardRepository.deleteTransaction(id, userId);
   },
 };

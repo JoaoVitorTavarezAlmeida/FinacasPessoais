@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { getCurrentUser } from "@/lib/auth/session";
 import { createCategory } from "@/lib/dashboard/create-category";
 import { createCategorySchema } from "@/lib/validation/category";
 import type { CategoryFormState } from "@/types/dashboard";
@@ -15,6 +16,16 @@ export async function createCategoryAction(
   _previousState: CategoryFormState,
   formData: FormData,
 ): Promise<CategoryFormState> {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    return {
+      errors: {},
+      message: "Sua sessao expirou. Entre novamente.",
+      success: false,
+    };
+  }
+
   const parsed = createCategorySchema.safeParse({
     name: formData.get("name"),
     description: formData.get("description"),
@@ -30,7 +41,7 @@ export async function createCategoryAction(
     };
   }
 
-  await createCategory(parsed.data);
+  await createCategory(parsed.data, currentUser.id);
   revalidatePath("/");
 
   return {

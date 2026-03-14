@@ -11,3 +11,13 @@ O seed automatico esta em `prisma/seed.mjs` e popula:
 - 4 categorias
 - transacoes recentes
 - 2 metas
+
+Credenciais iniciais do seed:
+
+- email: `<APP_USER_ID>@local.test`
+- senha: `12345678`
+
+Exemplo com a configuracao padrao:
+
+- email: `mock-user@local.test`
+- senha: `12345678`
