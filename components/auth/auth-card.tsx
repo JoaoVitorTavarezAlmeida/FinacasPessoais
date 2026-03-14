@@ -2,8 +2,8 @@
 
 import { useActionState, useState } from "react";
 
+import { initialAuthFormState } from "@/app/form-states";
 import {
-  initialAuthFormState,
   signInAction,
   signUpAction,
 } from "@/app/actions/auth-actions";

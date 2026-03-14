@@ -2,9 +2,9 @@
 
 import { useActionState } from "react";
 
+import { initialCategoryFormState } from "@/app/form-states";
 import {
   createCategoryAction,
-  initialCategoryFormState,
 } from "@/app/actions/category-actions";
 
 function FieldError({ errors }: { errors?: string[] }) {

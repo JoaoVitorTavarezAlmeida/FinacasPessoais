@@ -7,11 +7,6 @@ import { createCategory } from "@/lib/dashboard/create-category";
 import { createCategorySchema } from "@/lib/validation/category";
 import type { CategoryFormState } from "@/types/dashboard";
 
-export const initialCategoryFormState: CategoryFormState = {
-  errors: {},
-  success: false,
-};
-
 export async function createCategoryAction(
   _previousState: CategoryFormState,
   formData: FormData,

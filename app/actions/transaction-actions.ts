@@ -12,11 +12,6 @@ import {
 } from "@/lib/validation/transaction";
 import type { TransactionFormState } from "@/types/dashboard";
 
-export const initialTransactionFormState: TransactionFormState = {
-  errors: {},
-  success: false,
-};
-
 export async function createTransactionAction(
   _previousState: TransactionFormState,
   formData: FormData,

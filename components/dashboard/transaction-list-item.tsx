@@ -2,9 +2,9 @@
 
 import { useActionState } from "react";
 
+import { initialTransactionFormState } from "@/app/form-states";
 import {
   deleteTransactionAction,
-  initialTransactionFormState,
   updateTransactionAction,
 } from "@/app/actions/transaction-actions";
 import type { Category, Transaction } from "@/types/dashboard";

@@ -8,11 +8,6 @@ import { createUserSession, deleteUserSession } from "@/lib/auth/session";
 import { signInSchema, signUpSchema } from "@/lib/validation/auth";
 import type { AuthFormState } from "@/types/dashboard";
 
-export const initialAuthFormState: AuthFormState = {
-  errors: {},
-  success: false,
-};
-
 export async function signUpAction(
   _previousState: AuthFormState,
   formData: FormData,
