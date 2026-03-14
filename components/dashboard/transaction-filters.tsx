@@ -2,6 +2,8 @@ import type { Category } from "@/types/dashboard";
 
 type TransactionFiltersProps = {
   categories: Category[];
+  endDate?: string;
+  startDate?: string;
   selectedCategory?: string;
   selectedType?: string;
   search?: string;
@@ -9,6 +11,8 @@ type TransactionFiltersProps = {
 
 export function TransactionFilters({
   categories,
+  endDate = "",
+  startDate = "",
   selectedCategory = "",
   selectedType = "",
   search = "",
@@ -26,8 +30,8 @@ export function TransactionFilters({
         </div>
       </div>
 
-      <form className="mt-6 grid gap-4 md:grid-cols-[minmax(0,1.3fr)_minmax(180px,0.7fr)_minmax(220px,0.8fr)_auto]">
-        <label className="block">
+      <form className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-[minmax(0,1.15fr)_minmax(180px,0.6fr)_minmax(220px,0.7fr)_minmax(180px,0.55fr)_minmax(180px,0.55fr)_auto]">
+        <label className="block min-w-0">
           <span className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
             Busca
           </span>
@@ -40,7 +44,7 @@ export function TransactionFilters({
           />
         </label>
 
-        <label className="block">
+        <label className="block min-w-0">
           <span className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
             Tipo
           </span>
@@ -55,7 +59,7 @@ export function TransactionFilters({
           </select>
         </label>
 
-        <label className="block">
+        <label className="block min-w-0">
           <span className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
             Categoria
           </span>
@@ -73,15 +77,39 @@ export function TransactionFilters({
           </select>
         </label>
 
-        <div className="flex items-end gap-2">
+        <label className="block min-w-0">
+          <span className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
+            De
+          </span>
+          <input
+            className="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900"
+            defaultValue={startDate}
+            name="start"
+            type="date"
+          />
+        </label>
+
+        <label className="block min-w-0">
+          <span className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
+            Até
+          </span>
+          <input
+            className="mt-2 h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900"
+            defaultValue={endDate}
+            name="end"
+            type="date"
+          />
+        </label>
+
+        <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-end md:col-span-2 xl:col-span-3 2xl:col-span-1 2xl:justify-end">
           <button
-            className="h-12 rounded-2xl bg-slate-950 px-4 text-sm font-semibold text-white"
+            className="h-12 rounded-2xl bg-slate-950 px-4 text-sm font-semibold text-white sm:min-w-[112px]"
             type="submit"
           >
             Aplicar
           </button>
           <a
-            className="inline-flex h-12 items-center rounded-2xl border border-slate-200 px-4 text-sm font-medium text-slate-700"
+            className="inline-flex h-12 items-center justify-center rounded-2xl border border-slate-200 px-4 text-sm font-medium text-slate-700 sm:min-w-[112px]"
             href="/transactions"
           >
             Limpar

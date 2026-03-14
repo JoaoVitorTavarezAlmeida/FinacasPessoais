@@ -50,6 +50,10 @@ export async function signUpAction(
 
   await createUserSession(user.id);
   revalidatePath("/");
+  revalidatePath("/dashboard");
+  revalidatePath("/transactions");
+  revalidatePath("/categories");
+  revalidatePath("/goals");
 
   return {
     errors: {},
@@ -101,6 +105,10 @@ export async function signInAction(
 
   await createUserSession(user.id);
   revalidatePath("/");
+  revalidatePath("/dashboard");
+  revalidatePath("/transactions");
+  revalidatePath("/categories");
+  revalidatePath("/goals");
 
   return {
     errors: {},

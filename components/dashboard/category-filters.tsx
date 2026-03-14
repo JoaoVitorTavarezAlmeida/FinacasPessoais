@@ -20,7 +20,7 @@ export function CategoryFilters({
         </div>
       </div>
 
-      <form className="mt-6 grid gap-4 md:grid-cols-[minmax(0,1.25fr)_minmax(220px,0.75fr)_auto]">
+      <form className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-[minmax(0,1.25fr)_minmax(220px,0.75fr)_auto]">
         <label className="block min-w-0">
           <span className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
             Busca
@@ -34,7 +34,7 @@ export function CategoryFilters({
           />
         </label>
 
-        <label className="block">
+        <label className="block min-w-0">
           <span className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
             Limite
           </span>
@@ -49,15 +49,15 @@ export function CategoryFilters({
           </select>
         </label>
 
-        <div className="flex items-end gap-2">
+        <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-end md:col-span-2 xl:col-span-1 xl:justify-end">
           <button
-            className="h-12 rounded-2xl bg-slate-950 px-4 text-sm font-semibold text-white"
+            className="h-12 rounded-2xl bg-slate-950 px-4 text-sm font-semibold text-white sm:min-w-[112px]"
             type="submit"
           >
             Aplicar
           </button>
           <a
-            className="inline-flex h-12 items-center rounded-2xl border border-slate-200 px-4 text-sm font-medium text-slate-700"
+            className="inline-flex h-12 items-center justify-center rounded-2xl border border-slate-200 px-4 text-sm font-medium text-slate-700 sm:min-w-[112px]"
             href="/categories"
           >
             Limpar

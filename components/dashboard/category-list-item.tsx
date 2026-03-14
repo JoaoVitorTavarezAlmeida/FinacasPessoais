@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 
 import { initialCategoryFormState } from "@/app/form-states";
+import { ActionToast } from "@/components/feedback/action-toast";
 import {
   deleteCategoryAction,
   updateCategoryAction,
@@ -26,6 +27,8 @@ export function CategoryListItem({ category }: { category: Category }) {
 
   return (
     <article className="rounded-[24px] border border-slate-100 bg-slate-50/80 p-4">
+      <ActionToast message={formState.message} success={formState.success} />
+
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <span

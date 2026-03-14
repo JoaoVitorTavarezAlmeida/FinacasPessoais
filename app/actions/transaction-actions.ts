@@ -12,6 +12,11 @@ import {
 } from "@/lib/validation/transaction";
 import type { TransactionFormState } from "@/types/dashboard";
 
+function revalidateTransactionViews() {
+  revalidatePath("/dashboard");
+  revalidatePath("/transactions");
+}
+
 export async function createTransactionAction(
   _previousState: TransactionFormState,
   formData: FormData,
@@ -43,7 +48,7 @@ export async function createTransactionAction(
   }
 
   await createTransaction(parsed.data, currentUser.id);
-  revalidatePath("/dashboard");
+  revalidateTransactionViews();
 
   return {
     errors: {},
@@ -84,7 +89,7 @@ export async function updateTransactionAction(
   }
 
   await updateTransaction(parsed.data, currentUser.id);
-  revalidatePath("/dashboard");
+  revalidateTransactionViews();
 
   return {
     errors: {},
@@ -107,5 +112,5 @@ export async function deleteTransactionAction(formData: FormData) {
   }
 
   await deleteTransaction(id, currentUser.id);
-  revalidatePath("/dashboard");
+  revalidateTransactionViews();
 }

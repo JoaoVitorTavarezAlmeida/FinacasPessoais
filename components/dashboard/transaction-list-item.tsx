@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 
 import { initialTransactionFormState } from "@/app/form-states";
+import { ActionToast } from "@/components/feedback/action-toast";
 import {
   deleteTransactionAction,
   updateTransactionAction,
@@ -32,6 +33,8 @@ export function TransactionListItem({
 
   return (
     <article className="rounded-[24px] border border-slate-100 bg-slate-50/80 p-4">
+      <ActionToast message={formState.message} success={formState.success} />
+
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-slate-900">

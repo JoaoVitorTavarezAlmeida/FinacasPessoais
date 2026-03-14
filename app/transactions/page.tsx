@@ -14,7 +14,9 @@ export const dynamic = "force-dynamic";
 
 type TransactionsPageProps = {
   searchParams: Promise<{
+    end?: string;
     q?: string;
+    start?: string;
     type?: string;
     category?: string;
   }>;
@@ -38,6 +40,8 @@ export default async function TransactionsPage({
   const search = filters.q?.trim().toLowerCase() ?? "";
   const selectedType = filters.type ?? "";
   const selectedCategory = filters.category ?? "";
+  const startDate = filters.start ?? "";
+  const endDate = filters.end ?? "";
 
   const filteredTransactions = transactions.filter((transaction) => {
     const matchesSearch = search
@@ -49,8 +53,17 @@ export default async function TransactionsPage({
     const matchesCategory = selectedCategory
       ? transaction.categoryId === selectedCategory
       : true;
+    const transactionDate = transaction.occurredAt ?? "";
+    const matchesStart = startDate ? transactionDate >= startDate : true;
+    const matchesEnd = endDate ? transactionDate <= endDate : true;
 
-    return matchesSearch && matchesType && matchesCategory;
+    return (
+      matchesSearch &&
+      matchesType &&
+      matchesCategory &&
+      matchesStart &&
+      matchesEnd
+    );
   });
 
   const totalIncome = filteredTransactions
@@ -59,6 +72,16 @@ export default async function TransactionsPage({
   const totalExpense = filteredTransactions
     .filter((transaction) => transaction.type === "expense")
     .length;
+  const periodLabel =
+    startDate && endDate
+      ? `${new Intl.DateTimeFormat("pt-BR").format(new Date(startDate))} - ${new Intl.DateTimeFormat(
+          "pt-BR",
+        ).format(new Date(endDate))}`
+      : startDate
+        ? `Desde ${new Intl.DateTimeFormat("pt-BR").format(new Date(startDate))}`
+        : endDate
+          ? `Até ${new Intl.DateTimeFormat("pt-BR").format(new Date(endDate))}`
+          : "Periodo livre";
 
   return (
     <AppShell
@@ -81,18 +104,23 @@ export default async function TransactionsPage({
           </p>
         </article>
         <article className="rounded-[26px] border border-white/70 bg-white/84 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] backdrop-blur">
-          <p className="text-sm text-slate-500">Saídas no filtro</p>
-          <p className="mt-3 text-3xl font-semibold text-rose-600">
-            {totalExpense}
+          <p className="text-sm text-slate-500">Janela do filtro</p>
+          <p className="mt-3 text-lg font-semibold text-slate-950">
+            {periodLabel}
+          </p>
+          <p className="mt-1 text-sm text-slate-500">
+            {totalIncome} entradas e {totalExpense} saídas
           </p>
         </article>
       </section>
 
       <TransactionFilters
         categories={categories}
+        endDate={endDate}
         search={filters.q}
         selectedCategory={selectedCategory}
         selectedType={selectedType}
+        startDate={startDate}
       />
 
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.95fr)]">

@@ -7,6 +7,7 @@ import {
   updateGoalAction,
 } from "@/app/actions/goal-actions";
 import { initialGoalFormState } from "@/app/form-states";
+import { ActionToast } from "@/components/feedback/action-toast";
 import type { Goal } from "@/types/dashboard";
 
 function FieldError({ errors }: { errors?: string[] }) {
@@ -32,6 +33,8 @@ export function GoalListItem({ goal }: { goal: Goal }) {
 
   return (
     <article className="rounded-[24px] border border-slate-100 bg-slate-50/80 p-4">
+      <ActionToast message={formState.message} success={formState.success} />
+
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-sm font-semibold text-slate-900">{goal.name}</p>

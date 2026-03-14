@@ -12,6 +12,12 @@ import {
 } from "@/lib/validation/category";
 import type { CategoryFormState } from "@/types/dashboard";
 
+function revalidateCategoryViews() {
+  revalidatePath("/dashboard");
+  revalidatePath("/categories");
+  revalidatePath("/transactions");
+}
+
 export async function createCategoryAction(
   _previousState: CategoryFormState,
   formData: FormData,
@@ -42,7 +48,7 @@ export async function createCategoryAction(
   }
 
   await createCategory(parsed.data, currentUser.id);
-  revalidatePath("/dashboard");
+  revalidateCategoryViews();
 
   return {
     errors: {},
@@ -82,7 +88,7 @@ export async function updateCategoryAction(
   }
 
   await updateCategory(parsed.data, currentUser.id);
-  revalidatePath("/dashboard");
+  revalidateCategoryViews();
 
   return {
     errors: {},
@@ -105,5 +111,5 @@ export async function deleteCategoryAction(formData: FormData) {
   }
 
   await deleteCategory(id, currentUser.id);
-  revalidatePath("/dashboard");
+  revalidateCategoryViews();
 }

@@ -9,6 +9,11 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { createGoalSchema, updateGoalSchema } from "@/lib/validation/goal";
 import type { GoalFormState } from "@/types/dashboard";
 
+function revalidateGoalViews() {
+  revalidatePath("/dashboard");
+  revalidatePath("/goals");
+}
+
 export async function createGoalAction(
   _previousState: GoalFormState,
   formData: FormData,
@@ -39,7 +44,7 @@ export async function createGoalAction(
   }
 
   await createGoal(parsed.data, currentUser.id);
-  revalidatePath("/dashboard");
+  revalidateGoalViews();
 
   return {
     errors: {},
@@ -79,7 +84,7 @@ export async function updateGoalAction(
   }
 
   await updateGoal(parsed.data, currentUser.id);
-  revalidatePath("/dashboard");
+  revalidateGoalViews();
 
   return {
     errors: {},
@@ -102,5 +107,5 @@ export async function deleteGoalAction(formData: FormData) {
   }
 
   await deleteGoal(id, currentUser.id);
-  revalidatePath("/dashboard");
+  revalidateGoalViews();
 }

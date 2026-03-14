@@ -4,6 +4,7 @@ import { useActionState } from "react";
 
 import { createGoalAction } from "@/app/actions/goal-actions";
 import { initialGoalFormState } from "@/app/form-states";
+import { ActionToast } from "@/components/feedback/action-toast";
 
 function FieldError({ errors }: { errors?: string[] }) {
   if (!errors?.length) {
@@ -22,6 +23,8 @@ export function GoalForm() {
 
   return (
     <section className="rounded-[30px] border border-white/70 bg-[linear-gradient(180deg,rgba(8,47,73,0.98),rgba(15,118,110,0.96))] p-5 text-white shadow-[0_30px_80px_rgba(15,23,42,0.18)] md:p-6">
+      <ActionToast message={formState.message} success={formState.success} />
+
       <p className="text-sm uppercase tracking-[0.2em] text-white/60">
         Nova meta
       </p>

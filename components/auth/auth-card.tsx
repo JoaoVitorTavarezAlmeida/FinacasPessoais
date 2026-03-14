@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 
 import { initialAuthFormState } from "@/app/form-states";
+import { ActionToast } from "@/components/feedback/action-toast";
 import {
   signInAction,
   signUpAction,
@@ -31,6 +32,8 @@ export function AuthCard() {
 
   return (
     <section className="mx-auto w-full max-w-md rounded-[32px] border border-white/70 bg-white/88 p-6 shadow-[0_30px_80px_rgba(15,23,42,0.12)] backdrop-blur md:p-8">
+      <ActionToast message={state.message} success={state.success} />
+
       <p className="text-sm uppercase tracking-[0.24em] text-slate-500">
         Fatec Financas
       </p>
