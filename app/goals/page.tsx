@@ -1,6 +1,12 @@
 import { redirect } from "next/navigation";
 
-import { AppShell, GoalFilters, GoalForm, GoalsPanel } from "@/components/dashboard";
+import {
+  AppShell,
+  GoalFilters,
+  GoalForm,
+  GoalsPanel,
+  PaginationControls,
+} from "@/components/dashboard";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getDashboardData } from "@/lib/dashboard/get-dashboard-data";
 import { hasDatabaseUrl } from "@/lib/env";
@@ -9,8 +15,9 @@ export const dynamic = "force-dynamic";
 
 type GoalsPageProps = {
   searchParams: Promise<{
-    q?: string;
+    page?: string;
     progress?: string;
+    q?: string;
   }>;
 };
 
@@ -29,6 +36,7 @@ export default async function GoalsPage({ searchParams }: GoalsPageProps) {
   const filters = await searchParams;
   const search = filters.q?.trim().toLowerCase() ?? "";
   const selectedProgress = filters.progress ?? "";
+  const requestedPage = Number.parseInt(filters.page ?? "1", 10);
   const filteredGoals = goals.filter((goal) =>
     [
       search ? goal.name.toLowerCase().includes(search) : true,
@@ -49,6 +57,15 @@ export default async function GoalsPage({ searchParams }: GoalsPageProps) {
           filteredGoals.length,
       )
     : 0;
+  const pageSize = 8;
+  const totalPages = Math.max(1, Math.ceil(filteredGoals.length / pageSize));
+  const currentPage = Number.isNaN(requestedPage)
+    ? 1
+    : Math.min(Math.max(requestedPage, 1), totalPages);
+  const paginatedGoals = filteredGoals.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
 
   return (
     <AppShell
@@ -84,11 +101,24 @@ export default async function GoalsPage({ searchParams }: GoalsPageProps) {
         <GoalsPanel
           action={
             <span className="rounded-2xl bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
-              {filteredGoals.length} itens
+              Página {currentPage} de {totalPages}
             </span>
           }
           eyebrow="Resultado"
-          goals={filteredGoals}
+          footer={
+            <PaginationControls
+              basePath="/goals"
+              currentPage={currentPage}
+              pageSize={pageSize}
+              searchParams={{
+                progress: selectedProgress || undefined,
+                q: filters.q || undefined,
+              }}
+              totalItems={filteredGoals.length}
+              totalPages={totalPages}
+            />
+          }
+          goals={paginatedGoals}
           title="Metas encontradas"
         />
         <GoalForm />

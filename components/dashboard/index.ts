@@ -7,6 +7,7 @@ export { GoalsPanel } from "@/components/dashboard/goals-panel";
 export { CategoriesPanel } from "@/components/dashboard/categories-panel";
 export { HistoryChart } from "@/components/dashboard/history-chart";
 export { MobileNav } from "@/components/dashboard/mobile-nav";
+export { PaginationControls } from "@/components/dashboard/pagination-controls";
 export { RecentTransactionsCard } from "@/components/dashboard/recent-transactions-card";
 export { Sidebar } from "@/components/dashboard/sidebar";
 export { SummaryCard } from "@/components/dashboard/summary-card";

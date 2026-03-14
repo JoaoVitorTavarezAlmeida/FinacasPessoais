@@ -30,7 +30,7 @@ export function TransactionFilters({
         </div>
       </div>
 
-      <form className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-[minmax(0,1.15fr)_minmax(180px,0.6fr)_minmax(220px,0.7fr)_minmax(180px,0.55fr)_minmax(180px,0.55fr)_auto]">
+      <form className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <label className="block min-w-0">
           <span className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
             Busca
@@ -101,7 +101,7 @@ export function TransactionFilters({
           />
         </label>
 
-        <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-end md:col-span-2 xl:col-span-3 2xl:col-span-1 2xl:justify-end">
+        <div className="flex flex-col items-stretch gap-2 sm:col-span-2 sm:flex-row sm:items-end xl:col-span-3 xl:justify-end">
           <button
             className="h-12 rounded-2xl bg-slate-950 px-4 text-sm font-semibold text-white sm:min-w-[112px]"
             type="submit"

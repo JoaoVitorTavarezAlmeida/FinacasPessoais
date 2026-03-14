@@ -7,12 +7,14 @@ export function CategoriesPanel({
   eyebrow = "Categorias",
   action,
   emptyMessage = "Nenhuma categoria encontrada para os filtros atuais.",
+  footer,
 }: {
   categories: Category[];
   title?: string;
   eyebrow?: string;
   action?: React.ReactNode;
   emptyMessage?: string;
+  footer?: React.ReactNode;
 }) {
   return (
     <section className="rounded-[30px] border border-white/70 bg-white/84 p-5 shadow-[0_24px_60px_rgba(15,23,42,0.08)] backdrop-blur md:p-6">
@@ -43,6 +45,8 @@ export function CategoriesPanel({
           {emptyMessage}
         </div>
       )}
+
+      {footer}
     </section>
   );
 }

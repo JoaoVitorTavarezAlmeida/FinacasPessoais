@@ -5,6 +5,7 @@ import {
   CategoriesPanel,
   CategoryFilters,
   CategoryForm,
+  PaginationControls,
 } from "@/components/dashboard";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getDashboardData } from "@/lib/dashboard/get-dashboard-data";
@@ -14,8 +15,9 @@ export const dynamic = "force-dynamic";
 
 type CategoriesPageProps = {
   searchParams: Promise<{
-    q?: string;
     limit?: string;
+    page?: string;
+    q?: string;
   }>;
 };
 
@@ -36,6 +38,7 @@ export default async function CategoriesPage({
   const filters = await searchParams;
   const search = filters.q?.trim().toLowerCase() ?? "";
   const selectedLimit = filters.limit ?? "";
+  const requestedPage = Number.parseInt(filters.page ?? "1", 10);
   const filteredCategories = categories.filter((category) =>
     [
       search
@@ -53,6 +56,15 @@ export default async function CategoriesPage({
   const totalLimited = filteredCategories.filter(
     (category) => category.amount !== "Sem limite",
   ).length;
+  const pageSize = 8;
+  const totalPages = Math.max(1, Math.ceil(filteredCategories.length / pageSize));
+  const currentPage = Number.isNaN(requestedPage)
+    ? 1
+    : Math.min(Math.max(requestedPage, 1), totalPages);
+  const paginatedCategories = filteredCategories.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
   const highlightCategory = filteredCategories.find(
     (category) => category.amount !== "Sem limite",
   );
@@ -92,11 +104,24 @@ export default async function CategoriesPage({
         <CategoriesPanel
           action={
             <span className="rounded-2xl bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
-              {filteredCategories.length} itens
+              Página {currentPage} de {totalPages}
             </span>
           }
-          categories={filteredCategories}
+          categories={paginatedCategories}
           eyebrow="Resultado"
+          footer={
+            <PaginationControls
+              basePath="/categories"
+              currentPage={currentPage}
+              pageSize={pageSize}
+              searchParams={{
+                limit: selectedLimit || undefined,
+                q: filters.q || undefined,
+              }}
+              totalItems={filteredCategories.length}
+              totalPages={totalPages}
+            />
+          }
           title="Categorias encontradas"
         />
         <CategoryForm />

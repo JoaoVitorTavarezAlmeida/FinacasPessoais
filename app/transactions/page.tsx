@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import {
   AppShell,
+  PaginationControls,
   TransactionFilters,
   TransactionForm,
   TransactionsList,
@@ -15,6 +16,7 @@ export const dynamic = "force-dynamic";
 type TransactionsPageProps = {
   searchParams: Promise<{
     end?: string;
+    page?: string;
     q?: string;
     start?: string;
     type?: string;
@@ -42,6 +44,7 @@ export default async function TransactionsPage({
   const selectedCategory = filters.category ?? "";
   const startDate = filters.start ?? "";
   const endDate = filters.end ?? "";
+  const requestedPage = Number.parseInt(filters.page ?? "1", 10);
 
   const filteredTransactions = transactions.filter((transaction) => {
     const matchesSearch = search
@@ -72,6 +75,18 @@ export default async function TransactionsPage({
   const totalExpense = filteredTransactions
     .filter((transaction) => transaction.type === "expense")
     .length;
+  const pageSize = 8;
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredTransactions.length / pageSize),
+  );
+  const currentPage = Number.isNaN(requestedPage)
+    ? 1
+    : Math.min(Math.max(requestedPage, 1), totalPages);
+  const paginatedTransactions = filteredTransactions.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
   const periodLabel =
     startDate && endDate
       ? `${new Intl.DateTimeFormat("pt-BR").format(new Date(startDate))} - ${new Intl.DateTimeFormat(
@@ -127,13 +142,29 @@ export default async function TransactionsPage({
         <TransactionsList
           action={
             <span className="rounded-2xl bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
-              {filteredTransactions.length} itens
+              Página {currentPage} de {totalPages}
             </span>
           }
           categories={categories}
           eyebrow="Resultado"
+          footer={
+            <PaginationControls
+              basePath="/transactions"
+              currentPage={currentPage}
+              pageSize={pageSize}
+              searchParams={{
+                category: selectedCategory || undefined,
+                end: endDate || undefined,
+                q: filters.q || undefined,
+                start: startDate || undefined,
+                type: selectedType || undefined,
+              }}
+              totalItems={filteredTransactions.length}
+              totalPages={totalPages}
+            />
+          }
           title="Lançamentos encontrados"
-          transactions={filteredTransactions}
+          transactions={paginatedTransactions}
         />
         <TransactionForm categories={categories} />
       </section>
