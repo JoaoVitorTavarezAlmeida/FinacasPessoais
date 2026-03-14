@@ -19,7 +19,7 @@ export function TopBar({
         </h2>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-3 lg:min-w-[420px]">
         <label className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-500 sm:min-w-[320px]">
           <SearchIcon className="h-5 w-5 shrink-0" />
           <input
@@ -29,34 +29,38 @@ export function TopBar({
           />
         </label>
 
-        <button
-          aria-label="Notificações"
-          className="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700"
-          type="button"
-        >
-          <BellIcon className="h-5 w-5" />
-        </button>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+          <button
+            aria-label="Notificações"
+            className="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700"
+            type="button"
+          >
+            <BellIcon className="h-5 w-5" />
+          </button>
 
-        <div className="flex items-center gap-3 rounded-2xl bg-slate-950 px-3 py-2 text-white">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-sm font-semibold">
-            {(userName ?? "VA")
-              .split(" ")
-              .map((part) => part[0])
-              .join("")
-              .slice(0, 2)
-              .toUpperCase()}
-          </div>
-          <div className="pr-1">
-            <p className="text-sm font-medium">
-              {userName ?? "Modo demonstracao"}
-            </p>
-            <p className="text-xs text-white/60">
-              {userEmail ?? "Planejamento mensal"}
-            </p>
+          <div className="flex items-center justify-between gap-3 rounded-2xl bg-slate-950 px-3 py-2 text-white sm:min-w-[260px]">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-sm font-semibold">
+                {(userName ?? "VA")
+                  .split(" ")
+                  .map((part) => part[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()}
+              </div>
+              <div className="pr-1">
+                <p className="text-sm font-medium">
+                  {userName ?? "Modo demonstracao"}
+                </p>
+                <p className="text-xs text-white/60">
+                  {userEmail ?? "Planejamento mensal"}
+                </p>
+              </div>
+            </div>
+
+            {userName ? <SignOutButton /> : null}
           </div>
         </div>
-
-        {userName ? <SignOutButton /> : null}
       </div>
     </header>
   );

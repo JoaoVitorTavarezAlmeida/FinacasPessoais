@@ -1,8 +1,31 @@
+import fs from "node:fs";
+import path from "node:path";
+
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
-const connectionString = process.env.DATABASE_URL;
+function readEnvValue(key) {
+  const envPath = path.join(process.cwd(), ".env");
+
+  if (!fs.existsSync(envPath)) {
+    return process.env[key];
+  }
+
+  const envFile = fs.readFileSync(envPath, "utf8");
+  const line = envFile
+    .split("\n")
+    .find((entry) => entry.trim().startsWith(`${key}=`));
+
+  if (!line) {
+    return process.env[key];
+  }
+
+  const [, rawValue = ""] = line.split("=", 2);
+  return rawValue.trim().replace(/^"/, "").replace(/"$/, "");
+}
+
+const connectionString = process.env.DATABASE_URL ?? readEnvValue("DATABASE_URL");
 const appUserId = process.env.APP_USER_ID ?? "mock-user";
 
 if (!connectionString) {

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import { getDb } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
@@ -111,4 +112,7 @@ export async function signInAction(
 export async function signOutAction() {
   await deleteUserSession();
   revalidatePath("/");
+  revalidatePath("/dashboard");
+  revalidatePath("/auth");
+  redirect("/auth");
 }
