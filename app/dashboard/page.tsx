@@ -33,123 +33,152 @@ export default async function DashboardPage() {
     }
 
     const {
-      CategoryForm,
-      CategoriesPanel,
-      GoalForm,
-      GoalsPanel,
+      AppShell,
       HistoryChart,
-      MobileNav,
-      Sidebar,
+      RecentTransactionsCard,
       SummaryCard,
-      TopBar,
-      TransactionForm,
-      TransactionsList,
     } = await import("@/components/dashboard");
 
     const { categories, goals, history, summaryCards, transactions } =
       await getDashboardData(currentUser.id);
 
     return (
-      <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(45,212,191,0.18),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(14,116,144,0.12),_transparent_28%),linear-gradient(180deg,#f5f7f4_0%,#eef2f1_100%)] px-4 py-4 text-slate-950 sm:px-6 lg:px-8 lg:py-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="flex gap-6 lg:items-start">
-            <Sidebar />
+      <AppShell
+        description="Acompanhe rapidamente saldo, histórico recente e atalhos para as áreas principais do sistema."
+        eyebrow="Painel financeiro"
+        title="Visão geral da sua operação"
+        user={currentUser}
+      >
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {summaryCards.map((card) => (
+            <SummaryCard key={card.id} card={card} />
+          ))}
+        </section>
 
-            <div className="flex min-w-0 flex-1 flex-col gap-4 lg:gap-6">
-              <MobileNav />
-              <TopBar userEmail={currentUser.email} userName={currentUser.name} />
+        <section className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.95fr)]">
+          <HistoryChart data={history} />
+          <RecentTransactionsCard transactions={transactions} />
+        </section>
 
-              <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                {summaryCards.map((card) => (
-                  <SummaryCard key={card.id} card={card} />
-                ))}
-              </section>
-
-              <section className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.95fr)]">
-                <HistoryChart data={history} />
-                <TransactionsList
-                  categories={categories}
-                  transactions={transactions}
-                />
-              </section>
-
-              <section className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
-                <CategoriesPanel categories={categories} />
-                <TransactionForm categories={categories} />
-              </section>
-
-              <section className="grid gap-4">
-                <CategoryForm />
-              </section>
-
-              <section className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
-                <GoalsPanel goals={goals} />
-                <GoalForm />
-              </section>
-            </div>
-          </div>
-        </div>
-      </main>
+        <section className="grid gap-4 md:grid-cols-3">
+          <a
+            className="rounded-[26px] border border-white/70 bg-white/84 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] backdrop-blur"
+            href="/transactions"
+          >
+            <p className="text-sm uppercase tracking-[0.2em] text-slate-500">
+              Fluxo
+            </p>
+            <h3 className="mt-3 text-xl font-semibold text-slate-950">
+              Transações
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              {transactions.length} registros recentes e formulário dedicado.
+            </p>
+          </a>
+          <a
+            className="rounded-[26px] border border-white/70 bg-white/84 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] backdrop-blur"
+            href="/categories"
+          >
+            <p className="text-sm uppercase tracking-[0.2em] text-slate-500">
+              Organização
+            </p>
+            <h3 className="mt-3 text-xl font-semibold text-slate-950">
+              Categorias
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              {categories.length} categorias para classificar e ajustar limites.
+            </p>
+          </a>
+          <a
+            className="rounded-[26px] border border-white/70 bg-white/84 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] backdrop-blur"
+            href="/goals"
+          >
+            <p className="text-sm uppercase tracking-[0.2em] text-slate-500">
+              Planejamento
+            </p>
+            <h3 className="mt-3 text-xl font-semibold text-slate-950">
+              Metas
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              {goals.length} metas ativas para acompanhar progresso financeiro.
+            </p>
+          </a>
+        </section>
+      </AppShell>
     );
   }
 
   const {
-    CategoryForm,
-    CategoriesPanel,
-    GoalForm,
-    GoalsPanel,
+    AppShell,
     HistoryChart,
-    MobileNav,
-    Sidebar,
+    RecentTransactionsCard,
     SummaryCard,
-    TopBar,
-    TransactionForm,
-    TransactionsList,
   } = await import("@/components/dashboard");
 
   const { categories, goals, history, summaryCards, transactions } =
     await getDashboardData("mock-user");
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(45,212,191,0.18),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(14,116,144,0.12),_transparent_28%),linear-gradient(180deg,#f5f7f4_0%,#eef2f1_100%)] px-4 py-4 text-slate-950 sm:px-6 lg:px-8 lg:py-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="flex gap-6 lg:items-start">
-          <Sidebar />
+    <AppShell
+      description="Ambiente de demonstração com atalhos para navegar pela estrutura principal do sistema."
+      eyebrow="Painel financeiro"
+      title="Visão geral da sua operação"
+    >
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {summaryCards.map((card) => (
+          <SummaryCard key={card.id} card={card} />
+        ))}
+      </section>
 
-          <div className="flex min-w-0 flex-1 flex-col gap-4 lg:gap-6">
-            <MobileNav />
-            <TopBar />
+      <section className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.95fr)]">
+        <HistoryChart data={history} />
+        <RecentTransactionsCard transactions={transactions} />
+      </section>
 
-            <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              {summaryCards.map((card) => (
-                <SummaryCard key={card.id} card={card} />
-              ))}
-            </section>
-
-            <section className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.95fr)]">
-              <HistoryChart data={history} />
-              <TransactionsList
-                categories={categories}
-                transactions={transactions}
-              />
-            </section>
-
-            <section className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
-              <CategoriesPanel categories={categories} />
-              <TransactionForm categories={categories} />
-            </section>
-
-            <section className="grid gap-4">
-              <CategoryForm />
-            </section>
-
-            <section className="grid gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
-              <GoalsPanel goals={goals} />
-              <GoalForm />
-            </section>
-          </div>
-        </div>
-      </div>
-    </main>
+      <section className="grid gap-4 md:grid-cols-3">
+        <a
+          className="rounded-[26px] border border-white/70 bg-white/84 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] backdrop-blur"
+          href="/transactions"
+        >
+          <p className="text-sm uppercase tracking-[0.2em] text-slate-500">
+            Fluxo
+          </p>
+          <h3 className="mt-3 text-xl font-semibold text-slate-950">
+            Transações
+          </h3>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            {transactions.length} registros recentes e formulário dedicado.
+          </p>
+        </a>
+        <a
+          className="rounded-[26px] border border-white/70 bg-white/84 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] backdrop-blur"
+          href="/categories"
+        >
+          <p className="text-sm uppercase tracking-[0.2em] text-slate-500">
+            Organização
+          </p>
+          <h3 className="mt-3 text-xl font-semibold text-slate-950">
+            Categorias
+          </h3>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            {categories.length} categorias para classificar e ajustar limites.
+          </p>
+        </a>
+        <a
+          className="rounded-[26px] border border-white/70 bg-white/84 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.07)] backdrop-blur"
+          href="/goals"
+        >
+          <p className="text-sm uppercase tracking-[0.2em] text-slate-500">
+            Planejamento
+          </p>
+          <h3 className="mt-3 text-xl font-semibold text-slate-950">
+            Metas
+          </h3>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            {goals.length} metas ativas para acompanhar progresso financeiro.
+          </p>
+        </a>
+      </section>
+    </AppShell>
   );
 }

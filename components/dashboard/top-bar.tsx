@@ -4,19 +4,30 @@ import { SignOutButton } from "@/components/auth/sign-out-button";
 export function TopBar({
   userName,
   userEmail,
+  eyebrow = "Painel financeiro",
+  title = "Controle completo das suas finanças",
+  description,
 }: {
   userName?: string;
   userEmail?: string;
+  eyebrow?: string;
+  title?: string;
+  description?: string;
 }) {
   return (
     <header className="flex flex-col gap-4 rounded-[28px] border border-white/65 bg-white/78 p-4 shadow-[0_20px_60px_rgba(15,23,42,0.08)] backdrop-blur md:flex-row md:items-center md:justify-between md:p-5">
       <div>
         <p className="text-sm font-medium uppercase tracking-[0.24em] text-slate-500">
-          Painel financeiro
+          {eyebrow}
         </p>
         <h2 className="mt-2 text-2xl font-semibold text-slate-950">
-          Controle completo das suas finanças
+          {title}
         </h2>
+        {description ? (
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+            {description}
+          </p>
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-3 lg:min-w-[420px]">

@@ -1,3 +1,8 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 import {
   ArrowUpRightIcon,
   ChartIcon,
@@ -7,13 +12,15 @@ import {
 } from "@/components/dashboard/icons";
 
 const navigation = [
-  { label: "Visão geral", icon: ChartIcon, active: true },
-  { label: "Transações", icon: ArrowUpRightIcon, active: false },
-  { label: "Categorias", icon: TagIcon, active: false },
-  { label: "Planejamento", icon: GoalIcon, active: false },
+  { label: "Visão geral", icon: ChartIcon, href: "/dashboard" },
+  { label: "Transações", icon: ArrowUpRightIcon, href: "/transactions" },
+  { label: "Categorias", icon: TagIcon, href: "/categories" },
+  { label: "Metas", icon: GoalIcon, href: "/goals" },
 ];
 
 export function Sidebar() {
+  const pathname = usePathname();
+
   return (
     <aside className="hidden w-72 shrink-0 flex-col justify-between rounded-[28px] border border-white/70 bg-[linear-gradient(180deg,rgba(12,43,35,0.96),rgba(8,19,22,0.98))] p-6 text-white shadow-[0_24px_80px_rgba(6,18,24,0.24)] lg:flex">
       <div className="space-y-10">
@@ -32,20 +39,21 @@ export function Sidebar() {
         <nav className="space-y-2">
           {navigation.map((item) => {
             const Icon = item.icon;
+            const active = pathname === item.href;
 
             return (
-              <button
+              <Link
+                href={item.href}
                 key={item.label}
                 className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition ${
-                  item.active
+                  active
                     ? "bg-white text-slate-950 shadow-lg"
                     : "text-white/72 hover:bg-white/8 hover:text-white"
                 }`}
-                type="button"
               >
                 <Icon className="h-5 w-5" />
                 <span className="text-sm font-medium">{item.label}</span>
-              </button>
+              </Link>
             );
           })}
         </nav>
