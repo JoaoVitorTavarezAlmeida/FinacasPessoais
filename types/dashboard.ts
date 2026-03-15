@@ -157,12 +157,43 @@ export type AuthInput = {
   name?: string;
   email: string;
   password: string;
+  confirmPassword?: string;
 };
 
 export type AuthFormErrors = Partial<Record<keyof AuthInput, string[]>>;
 
 export type AuthFormState = {
   errors: AuthFormErrors;
+  message?: string;
+  success: boolean;
+};
+
+export type PasswordResetRequestInput = {
+  email: string;
+};
+
+export type PasswordResetRequestFormErrors = Partial<
+  Record<keyof PasswordResetRequestInput, string[]>
+>;
+
+export type PasswordResetRequestFormState = {
+  errors: PasswordResetRequestFormErrors;
+  message?: string;
+  success: boolean;
+};
+
+export type ResetPasswordInput = {
+  token: string;
+  password: string;
+  confirmPassword: string;
+};
+
+export type ResetPasswordFormErrors = Partial<
+  Record<keyof ResetPasswordInput, string[]>
+>;
+
+export type ResetPasswordFormState = {
+  errors: ResetPasswordFormErrors;
   message?: string;
   success: boolean;
 };

@@ -2,6 +2,8 @@ import type {
   AuthFormState,
   CategoryFormState,
   GoalFormState,
+  PasswordResetRequestFormState,
+  ResetPasswordFormState,
   TransactionFormState,
 } from "@/types/dashboard";
 
@@ -21,6 +23,16 @@ export const initialAuthFormState: AuthFormState = {
 };
 
 export const initialGoalFormState: GoalFormState = {
+  errors: {},
+  success: false,
+};
+
+export const initialPasswordResetRequestFormState: PasswordResetRequestFormState = {
+  errors: {},
+  success: false,
+};
+
+export const initialResetPasswordFormState: ResetPasswordFormState = {
   errors: {},
   success: false,
 };

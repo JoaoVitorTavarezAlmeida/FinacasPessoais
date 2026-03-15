@@ -102,13 +102,19 @@ Exemplo de variaveis:
 
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/fatec_financas?schema=public"
+APP_BASE_URL="http://localhost:3000"
 APP_USER_ID="mock-user"
+EMAIL_FROM="no-reply@seu-dominio.com"
+RESEND_API_KEY=""
 ```
 
 ### Sobre as variaveis
 
 - `DATABASE_URL`: conexao principal com PostgreSQL
+- `APP_BASE_URL`: URL publica usada em links de recuperacao de senha
 - `APP_USER_ID`: usado no seed inicial e em cenarios de apoio
+- `EMAIL_FROM`: remetente do email transacional
+- `RESEND_API_KEY`: chave da API do Resend para envio de email
 
 Se `DATABASE_URL` nao estiver presente, a aplicacao continua funcionando em modo demonstracao com dados mockados.
 
