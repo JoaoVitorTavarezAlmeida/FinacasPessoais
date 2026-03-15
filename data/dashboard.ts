@@ -78,6 +78,7 @@ export const transactions: Transaction[] = [
     category: "Renda fixa",
     date: "Hoje, 09:12",
     amount: "+R$ 8.300",
+    scope: "balance",
     type: "income",
   },
   {
@@ -86,6 +87,7 @@ export const transactions: Transaction[] = [
     category: "Alimentação",
     date: "Hoje, 07:45",
     amount: "-R$ 286",
+    scope: "balance",
     type: "expense",
   },
   {
@@ -94,6 +96,7 @@ export const transactions: Transaction[] = [
     category: "Lazer",
     date: "Ontem, 22:18",
     amount: "-R$ 39",
+    scope: "balance",
     type: "expense",
   },
   {
@@ -102,6 +105,7 @@ export const transactions: Transaction[] = [
     category: "Projetos extras",
     date: "Ontem, 18:03",
     amount: "+R$ 1.200",
+    scope: "balance",
     type: "income",
   },
   {
@@ -110,6 +114,7 @@ export const transactions: Transaction[] = [
     category: "Transporte",
     date: "12 mar, 08:30",
     amount: "-R$ 220",
+    scope: "balance",
     type: "expense",
   },
 ];

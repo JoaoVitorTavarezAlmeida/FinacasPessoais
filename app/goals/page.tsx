@@ -9,6 +9,7 @@ import {
 } from "@/components/dashboard";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getDashboardData } from "@/lib/dashboard/get-dashboard-data";
+import { getGoalHighlight } from "@/lib/dashboard/get-goal-highlight";
 import { hasDatabaseUrl } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
@@ -71,6 +72,13 @@ export default async function GoalsPage({ searchParams }: GoalsPageProps) {
     <AppShell
       description="Acompanhe seus objetivos financeiros sem poluir a visão geral da dashboard."
       eyebrow="Metas"
+      goalHighlight={getGoalHighlight(goals)}
+      searchAction="/goals"
+      searchDefaultValue={filters.q ?? ""}
+      searchHiddenFields={{
+        progress: selectedProgress || undefined,
+      }}
+      searchPlaceholder="Buscar meta por nome"
       title="Planejamento financeiro"
       user={currentUser}
     >

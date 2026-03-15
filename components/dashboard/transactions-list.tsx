@@ -1,9 +1,10 @@
-import type { Category, Transaction } from "@/types/dashboard";
+import type { Category, Goal, Transaction } from "@/types/dashboard";
 import { TransactionListItem } from "@/components/dashboard/transaction-list-item";
 
 export function TransactionsList({
   transactions,
   categories,
+  goals,
   title = "Últimos lançamentos",
   eyebrow = "Transações",
   action,
@@ -12,6 +13,7 @@ export function TransactionsList({
 }: {
   transactions: Transaction[];
   categories: Category[];
+  goals: Goal[];
   title?: string;
   eyebrow?: string;
   action?: React.ReactNode;
@@ -38,6 +40,7 @@ export function TransactionsList({
             <TransactionListItem
               key={transaction.id}
               categories={categories}
+              goals={goals}
               transaction={transaction}
             />
           ))}

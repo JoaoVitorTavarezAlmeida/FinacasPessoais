@@ -1,5 +1,6 @@
 import { getCurrentUser } from "@/lib/auth/session";
 import { getDashboardData } from "@/lib/dashboard/get-dashboard-data";
+import { getGoalHighlight } from "@/lib/dashboard/get-goal-highlight";
 import { hasDatabaseUrl } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
@@ -41,11 +42,15 @@ export default async function DashboardPage() {
 
     const { categories, goals, history, summaryCards, transactions } =
       await getDashboardData(currentUser.id);
+    const goalHighlight = getGoalHighlight(goals);
 
     return (
       <AppShell
         description="Acompanhe rapidamente saldo, histórico recente e atalhos para as áreas principais do sistema."
         eyebrow="Painel financeiro"
+        goalHighlight={goalHighlight}
+        searchAction="/transactions"
+        searchPlaceholder="Buscar e abrir em transações"
         title="Visão geral da sua operação"
         user={currentUser}
       >
@@ -117,11 +122,15 @@ export default async function DashboardPage() {
 
   const { categories, goals, history, summaryCards, transactions } =
     await getDashboardData("mock-user");
+  const goalHighlight = getGoalHighlight(goals);
 
   return (
     <AppShell
       description="Ambiente de demonstração com atalhos para navegar pela estrutura principal do sistema."
       eyebrow="Painel financeiro"
+      goalHighlight={goalHighlight}
+      searchAction="/transactions"
+      searchPlaceholder="Buscar e abrir em transações"
       title="Visão geral da sua operação"
     >
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

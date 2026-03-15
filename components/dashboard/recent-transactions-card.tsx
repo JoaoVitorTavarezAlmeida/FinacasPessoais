@@ -27,7 +27,7 @@ export function RecentTransactionsCard({
       </div>
 
       <div className="mt-6 space-y-3">
-        {transactions.map((transaction) => (
+        {transactions.slice(0, 5).map((transaction) => (
           <article
             key={transaction.id}
             className="flex items-center justify-between gap-4 rounded-[24px] border border-slate-100 bg-slate-50/80 p-4"

@@ -2,12 +2,20 @@ import { BellIcon, SearchIcon } from "@/components/dashboard/icons";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 
 export function TopBar({
+  searchAction = "/transactions",
+  searchDefaultValue = "",
+  searchHiddenFields,
+  searchPlaceholder = "Buscar transação, categoria ou meta",
   userName,
   userEmail,
   eyebrow = "Painel financeiro",
   title = "Controle completo das suas finanças",
   description,
 }: {
+  searchAction?: string;
+  searchDefaultValue?: string;
+  searchHiddenFields?: Record<string, string | undefined>;
+  searchPlaceholder?: string;
   userName?: string;
   userEmail?: string;
   eyebrow?: string;
@@ -31,14 +39,37 @@ export function TopBar({
       </div>
 
       <div className="flex flex-col gap-3 lg:min-w-[420px]">
-        <label className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-500 sm:min-w-[320px]">
-          <SearchIcon className="h-5 w-5 shrink-0" />
-          <input
-            className="w-full bg-transparent text-sm text-slate-800 outline-none placeholder:text-slate-400"
-            placeholder="Buscar transação, categoria ou meta"
-            type="search"
-          />
-        </label>
+        <form
+          action={searchAction}
+          className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center"
+        >
+          {searchHiddenFields
+            ? Object.entries(searchHiddenFields).map(([key, value]) =>
+                value ? (
+                  <input key={key} name={key} type="hidden" value={value} />
+                ) : null,
+              )
+            : null}
+          <input name="page" type="hidden" value="1" />
+
+          <label className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-500 sm:min-w-[320px]">
+            <SearchIcon className="h-5 w-5 shrink-0" />
+            <input
+              className="w-full bg-transparent text-sm text-slate-800 outline-none placeholder:text-slate-400"
+              defaultValue={searchDefaultValue}
+              name="q"
+              placeholder={searchPlaceholder}
+              type="search"
+            />
+          </label>
+
+          <button
+            className="inline-flex h-12 items-center justify-center rounded-2xl bg-slate-950 px-4 text-sm font-semibold text-white sm:shrink-0"
+            type="submit"
+          >
+            Buscar
+          </button>
+        </form>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
           <button

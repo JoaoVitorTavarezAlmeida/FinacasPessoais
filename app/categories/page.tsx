@@ -9,6 +9,7 @@ import {
 } from "@/components/dashboard";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getDashboardData } from "@/lib/dashboard/get-dashboard-data";
+import { getGoalHighlight } from "@/lib/dashboard/get-goal-highlight";
 import { hasDatabaseUrl } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +35,7 @@ export default async function CategoriesPage({
     redirect("/auth");
   }
 
-  const { categories } = await getDashboardData(currentUser.id);
+  const { categories, goals } = await getDashboardData(currentUser.id);
   const filters = await searchParams;
   const search = filters.q?.trim().toLowerCase() ?? "";
   const selectedLimit = filters.limit ?? "";
@@ -73,6 +74,13 @@ export default async function CategoriesPage({
     <AppShell
       description="Organize seus gastos por grupos, ajuste limites e mantenha a classificação das transações consistente."
       eyebrow="Categorias"
+      goalHighlight={getGoalHighlight(goals)}
+      searchAction="/categories"
+      searchDefaultValue={filters.q ?? ""}
+      searchHiddenFields={{
+        limit: selectedLimit || undefined,
+      }}
+      searchPlaceholder="Buscar categoria por nome ou descrição"
       title="Controle de categorias"
       user={currentUser}
     >

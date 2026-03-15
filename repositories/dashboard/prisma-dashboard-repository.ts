@@ -56,6 +56,68 @@ function parseCurrencyInput(input: string) {
   return Number.isFinite(value) ? value : 0;
 }
 
+function applyGoalMovement({
+  current,
+  amount,
+  type,
+  reverse = false,
+}: {
+  current: number;
+  amount: number;
+  type: "INCOME" | "EXPENSE";
+  reverse?: boolean;
+}) {
+  const delta = type === "INCOME" ? amount : -amount;
+  const nextValue = reverse ? current - delta : current + delta;
+
+  if (nextValue < 0) {
+    throw new Error("A movimentacao deixaria a meta com saldo negativo.");
+  }
+
+  return nextValue;
+}
+
+async function updateGoalCurrent({
+  amount,
+  db,
+  goalId,
+  reverse = false,
+  type,
+  userId,
+}: {
+  amount: number;
+  db: Prisma.TransactionClient | ReturnType<typeof getDb>;
+  goalId: string;
+  reverse?: boolean;
+  type: "INCOME" | "EXPENSE";
+  userId: string;
+}) {
+  const goal = await db.goal.findFirst({
+    where: {
+      id: goalId,
+      userId,
+    },
+  });
+
+  if (!goal) {
+    throw new Error("A meta selecionada nao foi encontrada.");
+  }
+
+  const nextCurrent = applyGoalMovement({
+    amount,
+    current: Number(goal.current),
+    reverse,
+    type,
+  });
+
+  await db.goal.update({
+    where: { id: goal.id },
+    data: {
+      current: new Prisma.Decimal(nextCurrent),
+    },
+  });
+}
+
 function buildHistoryPoints(
   totalsByDay: Map<string, number>,
   referenceDate: Date,
@@ -130,7 +192,7 @@ export const prismaDashboardRepository: DashboardRepository = {
     const previous30DaysStart = new Date(last30DaysStart);
     previous30DaysStart.setDate(last30DaysStart.getDate() - 30);
 
-    const [categoriesRaw, latestTransactions, monthTransactions, previousTransactions, goalsRaw] =
+    const [categoriesRaw, allTransactionsRaw, monthTransactions, previousTransactions, goalsRaw] =
       await Promise.all([
         db.category.findMany({
           where: { userId },
@@ -138,13 +200,13 @@ export const prismaDashboardRepository: DashboardRepository = {
         }),
         db.transaction.findMany({
           where: { userId },
-          include: { category: true },
+          include: { category: true, goal: true },
           orderBy: { occurredAt: "desc" },
-          take: 5,
         }),
         db.transaction.findMany({
           where: {
             userId,
+            scope: "BALANCE",
             occurredAt: {
               gte: last30DaysStart,
             },
@@ -154,6 +216,7 @@ export const prismaDashboardRepository: DashboardRepository = {
         db.transaction.findMany({
           where: {
             userId,
+            scope: "BALANCE",
             occurredAt: {
               gte: previous30DaysStart,
               lt: last30DaysStart,
@@ -176,7 +239,7 @@ export const prismaDashboardRepository: DashboardRepository = {
       color: category.color,
     }));
 
-    const transactions: Transaction[] = latestTransactions.map((transaction) => {
+    const transactions: Transaction[] = allTransactionsRaw.map((transaction) => {
       const signedAmount =
         transaction.type === "INCOME"
           ? formatSignedCurrency(Number(transaction.amount))
@@ -185,11 +248,17 @@ export const prismaDashboardRepository: DashboardRepository = {
       return {
         id: transaction.id,
         title: transaction.title,
-        category: transaction.category?.name ?? "Sem categoria",
+        category:
+          transaction.scope === "GOAL"
+            ? `Meta · ${transaction.goal?.name ?? "Sem meta"}`
+            : transaction.category?.name ?? "Sem categoria",
         categoryId: transaction.categoryId ?? undefined,
         date: formatTransactionDate(transaction.occurredAt),
         occurredAt: transaction.occurredAt.toISOString().slice(0, 10),
         amount: signedAmount,
+        goalId: transaction.goalId ?? undefined,
+        goalName: transaction.goal?.name ?? undefined,
+        scope: transaction.scope === "GOAL" ? "goal" : "balance",
         type: transaction.type === "INCOME" ? "income" : "expense",
       };
     });
@@ -305,16 +374,31 @@ export const prismaDashboardRepository: DashboardRepository = {
     userId: string,
   ): Promise<void> {
     const db = getDb();
+    const amount = parseCurrencyInput(input.amount);
 
-    await db.transaction.create({
-      data: {
-        title: input.title,
-        amount: new Prisma.Decimal(parseCurrencyInput(input.amount)),
-        type: input.type === "income" ? "INCOME" : "EXPENSE",
-        categoryId: input.categoryId,
-        occurredAt: new Date(input.occurredAt),
-        userId,
-      },
+    await db.$transaction(async (transactionDb) => {
+      if (input.scope === "goal" && input.goalId) {
+        await updateGoalCurrent({
+          amount,
+          db: transactionDb,
+          goalId: input.goalId,
+          type: input.type === "income" ? "INCOME" : "EXPENSE",
+          userId,
+        });
+      }
+
+      await transactionDb.transaction.create({
+        data: {
+          title: input.title,
+          amount: new Prisma.Decimal(amount),
+          scope: input.scope === "goal" ? "GOAL" : "BALANCE",
+          type: input.type === "income" ? "INCOME" : "EXPENSE",
+          categoryId: input.scope === "balance" ? input.categoryId : null,
+          goalId: input.scope === "goal" ? input.goalId : null,
+          occurredAt: new Date(input.occurredAt),
+          userId,
+        },
+      });
     });
   },
 
@@ -323,30 +407,86 @@ export const prismaDashboardRepository: DashboardRepository = {
     userId: string,
   ): Promise<void> {
     const db = getDb();
+    await db.$transaction(async (transactionDb) => {
+      const existingTransaction = await transactionDb.transaction.findFirst({
+        where: {
+          id: input.id,
+          userId,
+        },
+      });
 
-    await db.transaction.updateMany({
-      where: {
-        id: input.id,
-        userId,
-      },
-      data: {
-        title: input.title,
-        amount: new Prisma.Decimal(parseCurrencyInput(input.amount)),
-        type: input.type === "income" ? "INCOME" : "EXPENSE",
-        categoryId: input.categoryId,
-        occurredAt: new Date(input.occurredAt),
-      },
+      if (!existingTransaction) {
+        throw new Error("A movimentacao selecionada nao foi encontrada.");
+      }
+
+      if (existingTransaction.scope === "GOAL" && existingTransaction.goalId) {
+        await updateGoalCurrent({
+          amount: Number(existingTransaction.amount),
+          db: transactionDb,
+          goalId: existingTransaction.goalId,
+          reverse: true,
+          type: existingTransaction.type,
+          userId,
+        });
+      }
+
+      if (input.scope === "goal" && input.goalId) {
+        await updateGoalCurrent({
+          amount: parseCurrencyInput(input.amount),
+          db: transactionDb,
+          goalId: input.goalId,
+          type: input.type === "income" ? "INCOME" : "EXPENSE",
+          userId,
+        });
+      }
+
+      await transactionDb.transaction.update({
+        where: {
+          id: existingTransaction.id,
+        },
+        data: {
+          title: input.title,
+          amount: new Prisma.Decimal(parseCurrencyInput(input.amount)),
+          scope: input.scope === "goal" ? "GOAL" : "BALANCE",
+          type: input.type === "income" ? "INCOME" : "EXPENSE",
+          categoryId: input.scope === "balance" ? input.categoryId : null,
+          goalId: input.scope === "goal" ? input.goalId : null,
+          occurredAt: new Date(input.occurredAt),
+        },
+      });
     });
   },
 
   async deleteTransaction(id: string, userId: string): Promise<void> {
     const db = getDb();
+    await db.$transaction(async (transactionDb) => {
+      const existingTransaction = await transactionDb.transaction.findFirst({
+        where: {
+          id,
+          userId,
+        },
+      });
 
-    await db.transaction.deleteMany({
-      where: {
-        id,
-        userId,
-      },
+      if (!existingTransaction) {
+        return;
+      }
+
+      if (existingTransaction.scope === "GOAL" && existingTransaction.goalId) {
+        await updateGoalCurrent({
+          amount: Number(existingTransaction.amount),
+          db: transactionDb,
+          goalId: existingTransaction.goalId,
+          reverse: true,
+          type: existingTransaction.type,
+          userId,
+        });
+      }
+
+      await transactionDb.transaction.delete({
+        where: {
+          id: existingTransaction.id,
+        },
+      });
     });
   },
 

@@ -9,6 +9,7 @@ import {
 } from "@/components/dashboard";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getDashboardData } from "@/lib/dashboard/get-dashboard-data";
+import { getGoalHighlight } from "@/lib/dashboard/get-goal-highlight";
 import { hasDatabaseUrl } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
@@ -37,7 +38,7 @@ export default async function TransactionsPage({
     redirect("/auth");
   }
 
-  const { categories, transactions } = await getDashboardData(currentUser.id);
+  const { categories, goals, transactions } = await getDashboardData(currentUser.id);
   const filters = await searchParams;
   const search = filters.q?.trim().toLowerCase() ?? "";
   const selectedType = filters.type ?? "";
@@ -102,6 +103,16 @@ export default async function TransactionsPage({
     <AppShell
       description="Cadastre, edite e acompanhe todas as suas movimentações em um espaço dedicado."
       eyebrow="Transações"
+      goalHighlight={getGoalHighlight(goals)}
+      searchAction="/transactions"
+      searchDefaultValue={filters.q ?? ""}
+      searchHiddenFields={{
+        category: selectedCategory || undefined,
+        end: endDate || undefined,
+        start: startDate || undefined,
+        type: selectedType || undefined,
+      }}
+      searchPlaceholder="Buscar por título ou categoria"
       title="Gestão completa de transações"
       user={currentUser}
     >
@@ -146,6 +157,7 @@ export default async function TransactionsPage({
             </span>
           }
           categories={categories}
+          goals={goals}
           eyebrow="Resultado"
           footer={
             <PaginationControls
@@ -166,7 +178,7 @@ export default async function TransactionsPage({
           title="Lançamentos encontrados"
           transactions={paginatedTransactions}
         />
-        <TransactionForm categories={categories} />
+        <TransactionForm categories={categories} goals={goals} />
       </section>
     </AppShell>
   );

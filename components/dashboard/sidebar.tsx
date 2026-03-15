@@ -10,6 +10,7 @@ import {
   TagIcon,
   WalletIcon,
 } from "@/components/dashboard/icons";
+import type { GoalHighlight } from "@/lib/dashboard/get-goal-highlight";
 
 const navigation = [
   { label: "Visão geral", icon: ChartIcon, href: "/dashboard" },
@@ -18,7 +19,7 @@ const navigation = [
   { label: "Metas", icon: GoalIcon, href: "/goals" },
 ];
 
-export function Sidebar() {
+export function Sidebar({ goalHighlight }: { goalHighlight?: GoalHighlight | null }) {
   const pathname = usePathname();
 
   return (
@@ -59,16 +60,28 @@ export function Sidebar() {
         </nav>
       </div>
 
-      <div className="rounded-3xl border border-white/10 bg-white/6 p-5">
-        <p className="text-sm text-white/65">Meta em andamento</p>
-        <p className="mt-2 text-xl font-semibold">Reserva de emergência</p>
-        <p className="mt-3 text-sm text-white/70">
-          Você já completou 73% da sua meta anual.
-        </p>
-        <div className="mt-5 h-2 rounded-full bg-white/10">
-          <div className="h-2 w-[73%] rounded-full bg-emerald-300" />
+      {goalHighlight ? (
+        <div className="rounded-3xl border border-white/10 bg-white/6 p-5">
+          <p className="text-sm text-white/65">{goalHighlight.statusLabel}</p>
+          <p className="mt-2 text-xl font-semibold">{goalHighlight.name}</p>
+          <p className="mt-3 text-sm text-white/70">{goalHighlight.description}</p>
+          <div className="mt-5 h-2 rounded-full bg-white/10">
+            <div
+              className="h-2 rounded-full bg-emerald-300"
+              style={{ width: `${goalHighlight.progress}%` }}
+            />
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="rounded-3xl border border-white/10 bg-white/6 p-5">
+          <p className="text-sm text-white/65">Sem metas ativas</p>
+          <p className="mt-2 text-xl font-semibold">Planejamento pendente</p>
+          <p className="mt-3 text-sm text-white/70">
+            Crie uma meta para acompanhar progresso real por aqui.
+          </p>
+          <div className="mt-5 h-2 rounded-full bg-white/10" />
+        </div>
+      )}
     </aside>
   );
 }

@@ -14,6 +14,7 @@ export type HistoryPoint = {
 };
 
 export type TransactionType = "income" | "expense";
+export type TransactionScope = "balance" | "goal";
 
 export type Transaction = {
   id: string;
@@ -23,6 +24,9 @@ export type Transaction = {
   date: string;
   occurredAt?: string;
   amount: string;
+  goalId?: string;
+  goalName?: string;
+  scope: TransactionScope;
   type: TransactionType;
 };
 
@@ -71,8 +75,10 @@ export type UpdateCategoryInput = CreateCategoryInput & {
 export type CreateTransactionInput = {
   title: string;
   amount: string;
+  scope: TransactionScope;
   type: TransactionType;
-  categoryId: string;
+  categoryId?: string;
+  goalId?: string;
   occurredAt: string;
 };
 

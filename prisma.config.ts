@@ -19,7 +19,7 @@ function readLocalDatabaseUrl() {
     return process.env.DATABASE_URL ?? "";
   }
 
-  const [, rawValue = ""] = line.split("=", 2);
+  const rawValue = line.slice(line.indexOf("=") + 1);
   return rawValue.trim().replace(/^"/, "").replace(/"$/, "");
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { initialTransactionFormState } from "@/app/form-states";
 import { ActionToast } from "@/components/feedback/action-toast";
@@ -8,7 +8,7 @@ import {
   deleteTransactionAction,
   updateTransactionAction,
 } from "@/app/actions/transaction-actions";
-import type { Category, Transaction } from "@/types/dashboard";
+import type { Category, Goal, Transaction, TransactionScope } from "@/types/dashboard";
 
 function FieldError({ errors }: { errors?: string[] }) {
   if (!errors?.length) {
@@ -21,15 +21,18 @@ function FieldError({ errors }: { errors?: string[] }) {
 export function TransactionListItem({
   transaction,
   categories,
+  goals,
 }: {
   transaction: Transaction;
   categories: Category[];
+  goals: Goal[];
 }) {
   const [state, formAction, isPending] = useActionState(
     updateTransactionAction,
     initialTransactionFormState,
   );
   const formState = state ?? initialTransactionFormState;
+  const [scope, setScope] = useState<TransactionScope>(transaction.scope);
 
   return (
     <article className="rounded-[24px] border border-slate-100 bg-slate-50/80 p-4">
@@ -55,6 +58,11 @@ export function TransactionListItem({
           >
             {transaction.amount}
           </p>
+          {transaction.scope === "goal" ? (
+            <span className="rounded-full bg-sky-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-700">
+              Meta
+            </span>
+          ) : null}
           <details className="group">
             <summary className="cursor-pointer list-none rounded-xl border border-slate-200 px-3 py-2 text-xs font-medium text-slate-700">
               Editar
@@ -62,6 +70,24 @@ export function TransactionListItem({
             <div className="mt-3 w-full min-w-[280px] rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
               <form action={formAction} className="space-y-3">
                 <input name="id" type="hidden" value={transaction.id} />
+
+                <label className="block">
+                  <span className="text-xs font-medium text-slate-600">
+                    Aplicar em
+                  </span>
+                  <select
+                    className="mt-1 h-[42px] w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900"
+                    defaultValue={transaction.scope}
+                    name="scope"
+                    onChange={(event) =>
+                      setScope(event.target.value as TransactionScope)
+                    }
+                  >
+                    <option value="balance">Saldo geral</option>
+                    <option value="goal">Meta</option>
+                  </select>
+                  <FieldError errors={formState.errors.scope} />
+                </label>
 
                 <label className="block">
                   <span className="text-xs font-medium text-slate-600">
@@ -107,15 +133,21 @@ export function TransactionListItem({
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <label className="block">
+                  <label
+                    className={`block transition ${
+                      scope === "balance" ? "opacity-100" : "opacity-45"
+                    }`}
+                  >
                     <span className="text-xs font-medium text-slate-600">
                       Categoria
                     </span>
                     <select
-                      className="mt-1 h-[42px] w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900"
+                      className="mt-1 h-[42px] w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+                      disabled={scope !== "balance"}
                       defaultValue={transaction.categoryId ?? ""}
                       name="categoryId"
                     >
+                      <option value="">Selecione</option>
                       {categories.map((category) => (
                         <option key={category.id} value={category.id}>
                           {category.name}
@@ -125,6 +157,32 @@ export function TransactionListItem({
                     <FieldError errors={formState.errors.categoryId} />
                   </label>
 
+                  <label
+                    className={`block transition ${
+                      scope === "goal" ? "opacity-100" : "opacity-45"
+                    }`}
+                  >
+                    <span className="text-xs font-medium text-slate-600">
+                      Meta
+                    </span>
+                    <select
+                      className="mt-1 h-[42px] w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
+                      defaultValue={transaction.goalId ?? ""}
+                      disabled={scope !== "goal"}
+                      name="goalId"
+                    >
+                      <option value="">Selecione</option>
+                      {goals.map((goal) => (
+                        <option key={goal.id} value={goal.id}>
+                          {goal.name}
+                        </option>
+                      ))}
+                    </select>
+                    <FieldError errors={formState.errors.goalId} />
+                  </label>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
                   <label className="block">
                     <span className="text-xs font-medium text-slate-600">
                       Data
@@ -137,6 +195,11 @@ export function TransactionListItem({
                     />
                     <FieldError errors={formState.errors.occurredAt} />
                   </label>
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs leading-5 text-slate-500">
+                    {scope === "goal"
+                      ? "Essa movimentacao altera apenas o saldo da meta vinculada."
+                      : "Essa movimentacao impacta o saldo geral e o historico."}
+                  </div>
                 </div>
 
                 {formState.message ? (
