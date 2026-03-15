@@ -7,13 +7,15 @@ import {
   ArrowUpRightIcon,
   ChartIcon,
   GoalIcon,
+  HomeIcon,
   TagIcon,
   WalletIcon,
 } from "@/components/dashboard/icons";
 import type { GoalHighlight } from "@/lib/dashboard/get-goal-highlight";
 
 const navigation = [
-  { label: "Visão geral", icon: ChartIcon, href: "/dashboard" },
+  { label: "Dashboard", icon: HomeIcon, href: "/dashboard" },
+  { label: "Estatísticas", icon: ChartIcon, href: "/statistics" },
   { label: "Transações", icon: ArrowUpRightIcon, href: "/transactions" },
   { label: "Categorias", icon: TagIcon, href: "/categories" },
   { label: "Metas", icon: GoalIcon, href: "/goals" },

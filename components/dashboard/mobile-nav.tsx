@@ -8,13 +8,15 @@ import {
   ArrowUpRightIcon,
   ChartIcon,
   GoalIcon,
+  HomeIcon,
   MenuIcon,
   TagIcon,
   WalletIcon,
 } from "@/components/dashboard/icons";
 
 const navigation = [
-  { label: "Dashboard", href: "/dashboard", icon: ChartIcon },
+  { label: "Dashboard", href: "/dashboard", icon: HomeIcon },
+  { label: "Estatísticas", href: "/statistics", icon: ChartIcon },
   { label: "Transações", href: "/transactions", icon: ArrowUpRightIcon },
   { label: "Categorias", href: "/categories", icon: TagIcon },
   { label: "Metas", href: "/goals", icon: GoalIcon },

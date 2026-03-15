@@ -78,6 +78,16 @@ export function WalletIcon({ className }: IconProps) {
   );
 }
 
+export function HomeIcon({ className }: IconProps) {
+  return (
+    <IconWrapper className={className}>
+      <path d="m4 11 8-6 8 6" />
+      <path d="M6.5 10.5V19h11v-8.5" />
+      <path d="M10 19v-5h4v5" />
+    </IconWrapper>
+  );
+}
+
 export function ChartIcon({ className }: IconProps) {
   return (
     <IconWrapper className={className}>
