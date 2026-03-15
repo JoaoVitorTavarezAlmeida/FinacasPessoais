@@ -9,6 +9,14 @@ import { createUserSession, deleteUserSession } from "@/lib/auth/session";
 import { signInSchema, signUpSchema } from "@/lib/validation/auth";
 import type { AuthFormState } from "@/types/dashboard";
 
+const INVALID_AUTH_MESSAGE = "Email ou senha invalidos.";
+
+async function delayFailedAuth() {
+  await new Promise((resolve) => {
+    setTimeout(resolve, 350);
+  });
+}
+
 export async function signUpAction(
   _previousState: AuthFormState,
   formData: FormData,
@@ -33,8 +41,9 @@ export async function signUpAction(
   });
 
   if (existingUser) {
+    await delayFailedAuth();
     return {
-      errors: { email: ["Ja existe uma conta com esse email."] },
+      errors: { email: ["Esse email nao esta disponivel."] },
       success: false,
     };
   }
@@ -51,6 +60,7 @@ export async function signUpAction(
   await createUserSession(user.id);
   revalidatePath("/");
   revalidatePath("/dashboard");
+  revalidatePath("/statistics");
   revalidatePath("/transactions");
   revalidatePath("/categories");
   revalidatePath("/goals");
@@ -85,8 +95,9 @@ export async function signInAction(
   });
 
   if (!user?.passwordHash) {
+    await delayFailedAuth();
     return {
-      errors: { email: ["Conta nao encontrada."] },
+      errors: { email: [INVALID_AUTH_MESSAGE] },
       success: false,
     };
   }
@@ -97,8 +108,9 @@ export async function signInAction(
   );
 
   if (!passwordMatches) {
+    await delayFailedAuth();
     return {
-      errors: { password: ["Senha invalida."] },
+      errors: { password: [INVALID_AUTH_MESSAGE] },
       success: false,
     };
   }
@@ -106,6 +118,7 @@ export async function signInAction(
   await createUserSession(user.id);
   revalidatePath("/");
   revalidatePath("/dashboard");
+  revalidatePath("/statistics");
   revalidatePath("/transactions");
   revalidatePath("/categories");
   revalidatePath("/goals");
@@ -121,6 +134,10 @@ export async function signOutAction() {
   await deleteUserSession();
   revalidatePath("/");
   revalidatePath("/dashboard");
+  revalidatePath("/statistics");
+  revalidatePath("/transactions");
+  revalidatePath("/categories");
+  revalidatePath("/goals");
   revalidatePath("/auth");
   redirect("/auth");
 }

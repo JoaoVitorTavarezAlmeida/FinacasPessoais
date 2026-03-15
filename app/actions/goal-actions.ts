@@ -11,6 +11,7 @@ import type { GoalFormState } from "@/types/dashboard";
 
 function revalidateGoalViews() {
   revalidatePath("/dashboard");
+  revalidatePath("/statistics");
   revalidatePath("/goals");
 }
 
@@ -43,7 +44,18 @@ export async function createGoalAction(
     };
   }
 
-  await createGoal(parsed.data, currentUser.id);
+  try {
+    await createGoal(parsed.data, currentUser.id);
+  } catch (error) {
+    return {
+      errors: {},
+      message:
+        error instanceof Error
+          ? error.message
+          : "Nao foi possivel criar a meta.",
+      success: false,
+    };
+  }
   revalidateGoalViews();
 
   return {
@@ -83,7 +95,18 @@ export async function updateGoalAction(
     };
   }
 
-  await updateGoal(parsed.data, currentUser.id);
+  try {
+    await updateGoal(parsed.data, currentUser.id);
+  } catch (error) {
+    return {
+      errors: {},
+      message:
+        error instanceof Error
+          ? error.message
+          : "Nao foi possivel atualizar a meta.",
+      success: false,
+    };
+  }
   revalidateGoalViews();
 
   return {
@@ -106,6 +129,10 @@ export async function deleteGoalAction(formData: FormData) {
     return;
   }
 
-  await deleteGoal(id, currentUser.id);
+  try {
+    await deleteGoal(id, currentUser.id);
+  } catch {
+    return;
+  }
   revalidateGoalViews();
 }

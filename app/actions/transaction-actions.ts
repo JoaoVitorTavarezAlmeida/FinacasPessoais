@@ -14,6 +14,7 @@ import type { TransactionFormState } from "@/types/dashboard";
 
 function revalidateTransactionViews() {
   revalidatePath("/dashboard");
+  revalidatePath("/statistics");
   revalidatePath("/transactions");
 }
 
@@ -143,6 +144,10 @@ export async function deleteTransactionAction(formData: FormData) {
     return;
   }
 
-  await deleteTransaction(id, currentUser.id);
+  try {
+    await deleteTransaction(id, currentUser.id);
+  } catch {
+    return;
+  }
   revalidateTransactionViews();
 }

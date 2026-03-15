@@ -14,6 +14,7 @@ import type { CategoryFormState } from "@/types/dashboard";
 
 function revalidateCategoryViews() {
   revalidatePath("/dashboard");
+  revalidatePath("/statistics");
   revalidatePath("/categories");
   revalidatePath("/transactions");
 }
@@ -47,12 +48,23 @@ export async function createCategoryAction(
     };
   }
 
-  await createCategory(parsed.data, currentUser.id);
+  try {
+    await createCategory(parsed.data, currentUser.id);
+  } catch (error) {
+    return {
+      errors: {},
+      message:
+        error instanceof Error
+          ? error.message
+          : "Nao foi possivel criar a categoria.",
+      success: false,
+    };
+  }
   revalidateCategoryViews();
 
   return {
     errors: {},
-    message: "Categoria validada e pronta para persistencia no backend.",
+    message: "Categoria criada com sucesso.",
     success: true,
   };
 }
@@ -87,7 +99,18 @@ export async function updateCategoryAction(
     };
   }
 
-  await updateCategory(parsed.data, currentUser.id);
+  try {
+    await updateCategory(parsed.data, currentUser.id);
+  } catch (error) {
+    return {
+      errors: {},
+      message:
+        error instanceof Error
+          ? error.message
+          : "Nao foi possivel atualizar a categoria.",
+      success: false,
+    };
+  }
   revalidateCategoryViews();
 
   return {
@@ -110,6 +133,10 @@ export async function deleteCategoryAction(formData: FormData) {
     return;
   }
 
-  await deleteCategory(id, currentUser.id);
+  try {
+    await deleteCategory(id, currentUser.id);
+  } catch {
+    return;
+  }
   revalidateCategoryViews();
 }
