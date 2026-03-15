@@ -1,12 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { initialTransactionFormState } from "@/app/form-states";
+import { ActionToast } from "@/components/feedback/action-toast";
 import {
   createTransactionAction,
 } from "@/app/actions/transaction-actions";
-import type { Category } from "@/types/dashboard";
+import type { Category, Goal, TransactionScope } from "@/types/dashboard";
 
 function FieldError({ errors }: { errors?: string[] }) {
   if (!errors?.length) {
@@ -16,24 +17,47 @@ function FieldError({ errors }: { errors?: string[] }) {
   return <p className="mt-2 text-xs text-rose-200">{errors[0]}</p>;
 }
 
-export function TransactionForm({ categories }: { categories: Category[] }) {
+export function TransactionForm({
+  categories,
+  goals,
+}: {
+  categories: Category[];
+  goals: Goal[];
+}) {
   const [state, formAction, isPending] = useActionState(
     createTransactionAction,
     initialTransactionFormState,
   );
   const formState = state ?? initialTransactionFormState;
+  const [scope, setScope] = useState<TransactionScope>("balance");
 
   return (
     <section className="rounded-[30px] border border-white/70 bg-[linear-gradient(180deg,rgba(15,23,42,0.98),rgba(30,41,59,0.96))] p-5 text-white shadow-[0_30px_80px_rgba(15,23,42,0.18)] md:p-6">
+      <ActionToast message={formState.message} success={formState.success} />
+
       <p className="text-sm uppercase tracking-[0.2em] text-white/60">
         Nova transacao
       </p>
       <h3 className="mt-2 text-xl font-semibold">Registrar movimentacao</h3>
       <p className="mt-2 text-sm leading-6 text-white/72">
-        Alimente a dashboard com entradas e saidas reais.
+        Registre entradas, saidas e aportes ou retiradas de metas.
       </p>
 
       <form action={formAction} className="mt-6 space-y-4">
+        <label className="block">
+          <span className="text-sm font-medium text-white/80">Aplicar em</span>
+          <select
+            className="mt-2 h-[50px] w-full rounded-2xl border border-white/12 bg-slate-900 px-4 text-sm text-white"
+            defaultValue="balance"
+            name="scope"
+            onChange={(event) => setScope(event.target.value as TransactionScope)}
+          >
+            <option value="balance">Saldo geral</option>
+            <option value="goal">Meta</option>
+          </select>
+          <FieldError errors={formState.errors.scope} />
+        </label>
+
         <label className="block">
           <span className="text-sm font-medium text-white/80">Titulo</span>
           <input
@@ -72,11 +96,18 @@ export function TransactionForm({ categories }: { categories: Category[] }) {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="block">
-            <span className="text-sm font-medium text-white/80">Categoria</span>
+          <label
+            className={`block transition ${
+              scope === "balance" ? "opacity-100" : "opacity-45"
+            }`}
+          >
+            <span className="text-sm font-medium text-white/80">
+              Categoria
+            </span>
             <select
-              className="mt-2 h-[50px] w-full rounded-2xl border border-white/12 bg-slate-900 px-4 text-sm text-white"
+              className="mt-2 h-[50px] w-full rounded-2xl border border-white/12 bg-slate-900 px-4 text-sm text-white disabled:cursor-not-allowed disabled:bg-slate-950/60 disabled:text-white/35"
               defaultValue=""
+              disabled={scope !== "balance"}
               name="categoryId"
             >
               <option disabled value="">
@@ -91,6 +122,32 @@ export function TransactionForm({ categories }: { categories: Category[] }) {
             <FieldError errors={formState.errors.categoryId} />
           </label>
 
+          <label
+            className={`block transition ${
+              scope === "goal" ? "opacity-100" : "opacity-45"
+            }`}
+          >
+            <span className="text-sm font-medium text-white/80">Meta</span>
+            <select
+              className="mt-2 h-[50px] w-full rounded-2xl border border-white/12 bg-slate-900 px-4 text-sm text-white disabled:cursor-not-allowed disabled:opacity-50"
+              defaultValue=""
+              disabled={scope !== "goal"}
+              name="goalId"
+            >
+              <option disabled value="">
+                Selecione
+              </option>
+              {goals.map((goal) => (
+                <option key={goal.id} value={goal.id}>
+                  {goal.name}
+                </option>
+              ))}
+            </select>
+            <FieldError errors={formState.errors.goalId} />
+          </label>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
           <label className="block">
             <span className="text-sm font-medium text-white/80">Data</span>
             <input
@@ -101,6 +158,11 @@ export function TransactionForm({ categories }: { categories: Category[] }) {
             />
             <FieldError errors={formState.errors.occurredAt} />
           </label>
+          <div className="rounded-2xl border border-white/10 bg-white/6 px-4 py-3 text-sm leading-6 text-white/72">
+            {scope === "goal"
+              ? "Movimentações de meta atualizam o saldo da meta e ficam fora do saldo geral."
+              : "Movimentações operacionais entram no saldo, cards e histórico da dashboard."}
+          </div>
         </div>
 
         {formState.message ? (

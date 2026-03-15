@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 
 import { initialCategoryFormState } from "@/app/form-states";
+import { ActionToast } from "@/components/feedback/action-toast";
 import {
   createCategoryAction,
 } from "@/app/actions/category-actions";
@@ -24,6 +25,8 @@ export function CategoryForm() {
 
   return (
     <section className="rounded-[30px] border border-white/70 bg-[linear-gradient(180deg,rgba(15,23,42,0.98),rgba(15,118,110,0.96))] p-5 text-white shadow-[0_30px_80px_rgba(15,23,42,0.18)] md:p-6">
+      <ActionToast message={formState.message} success={formState.success} />
+
       <p className="text-sm uppercase tracking-[0.2em] text-white/60">
         Nova categoria
       </p>

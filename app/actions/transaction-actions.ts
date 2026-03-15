@@ -12,6 +12,12 @@ import {
 } from "@/lib/validation/transaction";
 import type { TransactionFormState } from "@/types/dashboard";
 
+function revalidateTransactionViews() {
+  revalidatePath("/dashboard");
+  revalidatePath("/statistics");
+  revalidatePath("/transactions");
+}
+
 export async function createTransactionAction(
   _previousState: TransactionFormState,
   formData: FormData,
@@ -29,8 +35,10 @@ export async function createTransactionAction(
   const parsed = createTransactionSchema.safeParse({
     title: formData.get("title"),
     amount: formData.get("amount"),
+    scope: formData.get("scope"),
     type: formData.get("type"),
     categoryId: formData.get("categoryId"),
+    goalId: formData.get("goalId"),
     occurredAt: formData.get("occurredAt"),
   });
 
@@ -42,12 +50,26 @@ export async function createTransactionAction(
     };
   }
 
-  await createTransaction(parsed.data, currentUser.id);
-  revalidatePath("/dashboard");
+  try {
+    await createTransaction(parsed.data, currentUser.id);
+  } catch (error) {
+    return {
+      errors: {},
+      message:
+        error instanceof Error
+          ? error.message
+          : "Nao foi possivel registrar a movimentacao.",
+      success: false,
+    };
+  }
+  revalidateTransactionViews();
 
   return {
     errors: {},
-    message: "Transacao registrada com sucesso.",
+    message:
+      parsed.data.scope === "goal"
+        ? "Movimentacao da meta registrada com sucesso."
+        : "Transacao registrada com sucesso.",
     success: true,
   };
 }
@@ -70,8 +92,10 @@ export async function updateTransactionAction(
     id: formData.get("id"),
     title: formData.get("title"),
     amount: formData.get("amount"),
+    scope: formData.get("scope"),
     type: formData.get("type"),
     categoryId: formData.get("categoryId"),
+    goalId: formData.get("goalId"),
     occurredAt: formData.get("occurredAt"),
   });
 
@@ -83,12 +107,26 @@ export async function updateTransactionAction(
     };
   }
 
-  await updateTransaction(parsed.data, currentUser.id);
-  revalidatePath("/dashboard");
+  try {
+    await updateTransaction(parsed.data, currentUser.id);
+  } catch (error) {
+    return {
+      errors: {},
+      message:
+        error instanceof Error
+          ? error.message
+          : "Nao foi possivel atualizar a movimentacao.",
+      success: false,
+    };
+  }
+  revalidateTransactionViews();
 
   return {
     errors: {},
-    message: "Transacao atualizada com sucesso.",
+    message:
+      parsed.data.scope === "goal"
+        ? "Movimentacao da meta atualizada com sucesso."
+        : "Transacao atualizada com sucesso.",
     success: true,
   };
 }
@@ -106,6 +144,10 @@ export async function deleteTransactionAction(formData: FormData) {
     return;
   }
 
-  await deleteTransaction(id, currentUser.id);
-  revalidatePath("/dashboard");
+  try {
+    await deleteTransaction(id, currentUser.id);
+  } catch {
+    return;
+  }
+  revalidateTransactionViews();
 }

@@ -1,56 +1,52 @@
-import { PlusIcon } from "@/components/dashboard/icons";
+import { CategoryListItem } from "@/components/dashboard/category-list-item";
 import type { Category } from "@/types/dashboard";
 
-export function CategoriesPanel({ categories }: { categories: Category[] }) {
+export function CategoriesPanel({
+  categories,
+  title = "Organização de despesas",
+  eyebrow = "Categorias",
+  action,
+  emptyMessage = "Nenhuma categoria encontrada para os filtros atuais.",
+  footer,
+}: {
+  categories: Category[];
+  title?: string;
+  eyebrow?: string;
+  action?: React.ReactNode;
+  emptyMessage?: string;
+  footer?: React.ReactNode;
+}) {
   return (
     <section className="rounded-[30px] border border-white/70 bg-white/84 p-5 shadow-[0_24px_60px_rgba(15,23,42,0.08)] backdrop-blur md:p-6">
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="text-sm uppercase tracking-[0.2em] text-slate-500">
-            Categorias
+            {eyebrow}
           </p>
           <h3 className="mt-2 text-xl font-semibold text-slate-950">
-            Organização de despesas
+            {title}
           </h3>
         </div>
-        <button
-          className="inline-flex items-center gap-2 rounded-2xl bg-slate-950 px-4 py-2 text-sm font-medium text-white"
-          type="button"
-        >
-          <PlusIcon className="h-4 w-4" />
-          Nova categoria
-        </button>
+        {action ?? (
+          <span className="rounded-2xl bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
+            {categories.length} categorias
+          </span>
+        )}
       </div>
 
-      <div className="mt-6 space-y-3">
-        {categories.map((category) => (
-          <article
-            key={category.id}
-            className="rounded-[24px] border border-slate-100 bg-slate-50/80 p-4"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-start gap-3">
-                <span
-                  aria-hidden="true"
-                  className="mt-1 h-3 w-3 rounded-full"
-                  style={{ backgroundColor: category.color }}
-                />
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">
-                    {category.name}
-                  </p>
-                  <p className="mt-1 text-xs leading-5 text-slate-500">
-                    {category.description}
-                  </p>
-                </div>
-              </div>
-              <span className="text-sm font-semibold text-slate-700">
-                {category.amount}
-              </span>
-            </div>
-          </article>
-        ))}
-      </div>
+      {categories.length ? (
+        <div className="mt-6 space-y-3">
+          {categories.map((category) => (
+            <CategoryListItem key={category.id} category={category} />
+          ))}
+        </div>
+      ) : (
+        <div className="mt-6 rounded-[24px] border border-dashed border-slate-200 bg-slate-50/70 p-6 text-sm text-slate-500">
+          {emptyMessage}
+        </div>
+      )}
+
+      {footer}
     </section>
   );
 }
