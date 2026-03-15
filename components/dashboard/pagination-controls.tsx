@@ -70,10 +70,10 @@ export function PaginationControls({
         </p>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <a
           aria-disabled={currentPage === 1}
-          className={`inline-flex h-11 items-center justify-center rounded-2xl px-4 text-sm font-medium transition ${
+          className={`inline-flex h-11 min-w-[112px] items-center justify-center whitespace-nowrap rounded-2xl px-4 text-center text-sm font-medium transition ${
             currentPage === 1
               ? "pointer-events-none border border-slate-200 bg-slate-100 text-slate-400"
               : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
@@ -84,7 +84,7 @@ export function PaginationControls({
         </a>
         <a
           aria-disabled={currentPage === totalPages}
-          className={`inline-flex h-11 items-center justify-center rounded-2xl px-4 text-sm font-medium transition ${
+          className={`inline-flex h-11 min-w-[112px] items-center justify-center whitespace-nowrap rounded-2xl px-4 text-center text-sm font-medium transition ${
             currentPage === totalPages
               ? "pointer-events-none border border-slate-200 bg-slate-100 text-slate-400"
               : "bg-slate-950 text-white hover:bg-slate-800"

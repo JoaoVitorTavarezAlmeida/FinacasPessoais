@@ -8,8 +8,11 @@ import type {
   CreateGoalInput,
   CreateTransactionInput,
   DashboardData,
+  DashboardQueryOptions,
   Goal,
   HistoryPoint,
+  HistoryPeriod,
+  HistorySeries,
   SummaryCardData,
   Transaction,
   UpdateCategoryInput,
@@ -120,18 +123,124 @@ async function updateGoalCurrent({
 
 function buildHistoryPoints(
   totalsByDay: Map<string, number>,
-  referenceDate: Date,
+  startDate: Date,
+  endDate: Date,
 ): HistoryPoint[] {
-  return Array.from({ length: 30 }, (_, index) => {
-    const date = new Date(referenceDate);
-    date.setDate(referenceDate.getDate() - (29 - index));
-    const key = date.toISOString().slice(0, 10);
+  let runningBalance = 0;
+  const points: HistoryPoint[] = [];
+  const cursor = new Date(startDate);
 
-    return {
-      day: date.toLocaleString("pt-BR", { day: "2-digit" }),
-      amount: totalsByDay.get(key) ?? 0,
-    };
-  });
+  while (cursor <= endDate) {
+    const key = cursor.toISOString().slice(0, 10);
+    runningBalance += totalsByDay.get(key) ?? 0;
+    points.push({
+      date: key,
+      day: cursor.toLocaleString("pt-BR", { day: "2-digit" }),
+      amount: runningBalance,
+    });
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  return points;
+}
+
+function buildCategoryHistorySeries({
+  categories,
+  endDate,
+  startDate,
+  transactions,
+}: {
+  categories: Array<{ id: string; name: string; color: string }>;
+  endDate: Date;
+  startDate: Date;
+  transactions: Array<{
+    amount: Prisma.Decimal;
+    categoryId: string | null;
+    type: "INCOME" | "EXPENSE";
+  } & { occurredAt: Date }>;
+}): HistorySeries[] {
+  const totalsByCategory = new Map<string, Map<string, number>>();
+
+  for (const transaction of transactions) {
+    if (!transaction.categoryId) {
+      continue;
+    }
+
+    const categoryMap =
+      totalsByCategory.get(transaction.categoryId) ?? new Map<string, number>();
+    const key = transaction.occurredAt.toISOString().slice(0, 10);
+    const signal = transaction.type === "INCOME" ? 1 : -1;
+    const current = categoryMap.get(key) ?? 0;
+    categoryMap.set(key, current + Number(transaction.amount) * signal);
+    totalsByCategory.set(transaction.categoryId, categoryMap);
+  }
+
+  return categories
+    .filter((category) => totalsByCategory.has(category.id))
+    .map((category) => ({
+      id: category.id,
+      label: category.name,
+      color: category.color,
+      points: buildHistoryPoints(
+        totalsByCategory.get(category.id) ?? new Map<string, number>(),
+        startDate,
+        endDate,
+      ),
+    }));
+}
+
+function parseDateInput(value?: string) {
+  if (!value) {
+    return null;
+  }
+
+  const parsed = new Date(`${value}T00:00:00`);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function formatPeriodLabel(startDate: Date, endDate: Date, preset: HistoryPeriod["preset"]) {
+  if (preset === "current_month") {
+    return "Mês atual";
+  }
+
+  if (preset === "last_30_days") {
+    return "Últimos 30 dias";
+  }
+
+  return `${startDate.toLocaleDateString("pt-BR")} - ${endDate.toLocaleDateString("pt-BR")}`;
+}
+
+function resolveHistoryPeriod(
+  options: DashboardQueryOptions | undefined,
+  referenceDate: Date,
+): HistoryPeriod {
+  const today = new Date(referenceDate);
+  today.setHours(0, 0, 0, 0);
+
+  const preset = options?.historyPreset ?? "current_month";
+  const customStart = parseDateInput(options?.historyStartDate);
+  const customEnd = parseDateInput(options?.historyEndDate);
+
+  let startDate = new Date(today);
+  let endDate = new Date(today);
+  let normalizedPreset: HistoryPeriod["preset"] = preset;
+
+  if (preset === "custom" && customStart && customEnd) {
+    startDate = customStart <= customEnd ? customStart : customEnd;
+    endDate = customEnd >= customStart ? customEnd : customStart;
+  } else if (preset === "last_30_days") {
+    startDate.setDate(today.getDate() - 29);
+  } else {
+    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+    normalizedPreset = "current_month";
+  }
+
+  return {
+    preset: normalizedPreset,
+    startDate: startDate.toISOString().slice(0, 10),
+    endDate: endDate.toISOString().slice(0, 10),
+    label: formatPeriodLabel(startDate, endDate, normalizedPreset),
+  };
 }
 
 function buildSummaryCards({
@@ -182,17 +291,33 @@ function buildSummaryCards({
 }
 
 export const prismaDashboardRepository: DashboardRepository = {
-  async getDashboardData(userId: string): Promise<DashboardData> {
+  async getDashboardData(
+    userId: string,
+    options?: DashboardQueryOptions,
+  ): Promise<DashboardData> {
     const db = getDb();
     const now = new Date();
-    const last30DaysStart = new Date(now);
-    last30DaysStart.setDate(now.getDate() - 29);
-    last30DaysStart.setHours(0, 0, 0, 0);
+    now.setHours(0, 0, 0, 0);
+    const historyPeriod = resolveHistoryPeriod(options, now);
+    const historyStartDate = new Date(`${historyPeriod.startDate}T00:00:00`);
+    const historyEndDate = new Date(`${historyPeriod.endDate}T23:59:59.999`);
+    const currentWindowStart = new Date(historyStartDate);
+    const currentWindowEnd = new Date(historyEndDate);
+    const windowDays =
+      Math.max(
+        1,
+        Math.round(
+          (currentWindowEnd.getTime() - currentWindowStart.getTime()) /
+            (1000 * 60 * 60 * 24),
+        ) + 1,
+      );
 
-    const previous30DaysStart = new Date(last30DaysStart);
-    previous30DaysStart.setDate(last30DaysStart.getDate() - 30);
+    const previousWindowEnd = new Date(currentWindowStart);
+    previousWindowEnd.setMilliseconds(previousWindowEnd.getMilliseconds() - 1);
+    const previousWindowStart = new Date(currentWindowStart);
+    previousWindowStart.setDate(currentWindowStart.getDate() - windowDays);
 
-    const [categoriesRaw, allTransactionsRaw, monthTransactions, previousTransactions, goalsRaw] =
+    const [categoriesRaw, allTransactionsRaw, periodTransactions, previousTransactions, goalsRaw] =
       await Promise.all([
         db.category.findMany({
           where: { userId },
@@ -208,7 +333,8 @@ export const prismaDashboardRepository: DashboardRepository = {
             userId,
             scope: "BALANCE",
             occurredAt: {
-              gte: last30DaysStart,
+              gte: currentWindowStart,
+              lte: currentWindowEnd,
             },
           },
           orderBy: { occurredAt: "asc" },
@@ -218,8 +344,8 @@ export const prismaDashboardRepository: DashboardRepository = {
             userId,
             scope: "BALANCE",
             occurredAt: {
-              gte: previous30DaysStart,
-              lt: last30DaysStart,
+              gte: previousWindowStart,
+              lte: previousWindowEnd,
             },
           },
         }),
@@ -263,19 +389,43 @@ export const prismaDashboardRepository: DashboardRepository = {
       };
     });
 
-    const totalsByDay = monthTransactions.reduce((accumulator, transaction) => {
+    const totalsByDay = periodTransactions.reduce((accumulator, transaction) => {
       const key = transaction.occurredAt.toISOString().slice(0, 10);
       const current = accumulator.get(key) ?? 0;
       const signal = transaction.type === "INCOME" ? 1 : -1;
       accumulator.set(key, current + Number(transaction.amount) * signal);
       return accumulator;
     }, new Map<string, number>());
+    const history = buildHistoryPoints(
+      totalsByDay,
+      historyStartDate,
+      new Date(`${historyPeriod.endDate}T00:00:00`),
+    );
+    const historySeries: HistorySeries[] = [
+      {
+        id: "balance",
+        label: "Saldo principal",
+        color: "#0f766e",
+        isPrimary: true,
+        points: history,
+      },
+      ...buildCategoryHistorySeries({
+        categories: categoriesRaw.map((category) => ({
+          id: category.id,
+          name: category.name,
+          color: category.color,
+        })),
+        endDate: new Date(`${historyPeriod.endDate}T00:00:00`),
+        startDate: historyStartDate,
+        transactions: periodTransactions,
+      }),
+    ];
 
-    const incomeTotal = monthTransactions
+    const incomeTotal = periodTransactions
       .filter((transaction) => transaction.type === "INCOME")
       .reduce((total, transaction) => total + Number(transaction.amount), 0);
 
-    const expenseTotal = monthTransactions
+    const expenseTotal = periodTransactions
       .filter((transaction) => transaction.type === "EXPENSE")
       .reduce((total, transaction) => total + Number(transaction.amount), 0);
 
@@ -320,7 +470,9 @@ export const prismaDashboardRepository: DashboardRepository = {
         previousExpenseTotal,
         goalsProgress,
       }),
-      history: buildHistoryPoints(totalsByDay, now),
+      history,
+      historyPeriod,
+      historySeries,
       transactions,
       categories,
       goals,

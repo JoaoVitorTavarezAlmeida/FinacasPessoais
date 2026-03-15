@@ -38,7 +38,7 @@ export function TopBar({
         ) : null}
       </div>
 
-      <div className="flex flex-col gap-3 lg:min-w-[420px]">
+      <div className="flex min-w-0 flex-col gap-3 lg:min-w-[420px]">
         <form
           action={searchAction}
           className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center"
@@ -64,7 +64,7 @@ export function TopBar({
           </label>
 
           <button
-            className="inline-flex h-12 items-center justify-center rounded-2xl bg-slate-950 px-4 text-sm font-semibold text-white sm:shrink-0"
+            className="inline-flex h-12 items-center justify-center whitespace-nowrap rounded-2xl bg-slate-950 px-4 text-center text-sm font-semibold text-white sm:shrink-0"
             type="submit"
           >
             Buscar
@@ -82,7 +82,7 @@ export function TopBar({
 
           <div className="flex flex-col gap-3 rounded-2xl bg-slate-950 px-3 py-3 text-white sm:min-w-[280px] sm:flex-row sm:items-center sm:justify-between sm:py-2">
             <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-sm font-semibold">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-sm font-semibold">
                 {(userName ?? "VA")
                   .split(" ")
                   .map((part) => part[0])

@@ -1,6 +1,9 @@
 import { mockDashboardService } from "@/services/dashboard";
-import type { DashboardData } from "@/types/dashboard";
+import type { DashboardData, DashboardQueryOptions } from "@/types/dashboard";
 
-export async function getDashboardData(userId: string): Promise<DashboardData> {
-  return mockDashboardService.getDashboardData(userId);
+export async function getDashboardData(
+  userId: string,
+  options?: DashboardQueryOptions,
+): Promise<DashboardData> {
+  return mockDashboardService.getDashboardData(userId, options);
 }

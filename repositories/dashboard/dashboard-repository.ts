@@ -3,13 +3,17 @@ import type {
   CreateGoalInput,
   CreateTransactionInput,
   DashboardData,
+  DashboardQueryOptions,
   UpdateCategoryInput,
   UpdateGoalInput,
   UpdateTransactionInput,
 } from "@/types/dashboard";
 
 export type DashboardRepository = {
-  getDashboardData(userId: string): Promise<DashboardData>;
+  getDashboardData(
+    userId: string,
+    options?: DashboardQueryOptions,
+  ): Promise<DashboardData>;
   createCategory(input: CreateCategoryInput, userId: string): Promise<void>;
   updateCategory(input: UpdateCategoryInput, userId: string): Promise<void>;
   deleteCategory(id: string, userId: string): Promise<void>;

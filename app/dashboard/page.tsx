@@ -5,7 +5,23 @@ import { hasDatabaseUrl } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPage() {
+type DashboardPageProps = {
+  searchParams: Promise<{
+    end?: string;
+    period?: "current_month" | "last_30_days" | "custom";
+    start?: string;
+  }>;
+};
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+  const filters = await searchParams;
+  const selectedPeriod = filters.period ?? "current_month";
+  const historyOptions = {
+    historyEndDate: filters.end,
+    historyPreset: selectedPeriod,
+    historyStartDate: filters.start,
+  } as const;
+
   if (hasDatabaseUrl()) {
     const currentUser = await getCurrentUser();
 
@@ -40,8 +56,16 @@ export default async function DashboardPage() {
       SummaryCard,
     } = await import("@/components/dashboard");
 
-    const { categories, goals, history, summaryCards, transactions } =
-      await getDashboardData(currentUser.id);
+    const {
+      categories,
+      goals,
+      history,
+      historyPeriod,
+      historySeries,
+      summaryCards,
+      transactions,
+    } =
+      await getDashboardData(currentUser.id, historyOptions);
     const goalHighlight = getGoalHighlight(goals);
 
     return (
@@ -61,7 +85,11 @@ export default async function DashboardPage() {
         </section>
 
         <section className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.95fr)]">
-          <HistoryChart data={history} />
+          <HistoryChart
+            data={history}
+            period={historyPeriod}
+            series={historySeries}
+          />
           <RecentTransactionsCard transactions={transactions} />
         </section>
 
@@ -120,8 +148,16 @@ export default async function DashboardPage() {
     SummaryCard,
   } = await import("@/components/dashboard");
 
-  const { categories, goals, history, summaryCards, transactions } =
-    await getDashboardData("mock-user");
+  const {
+    categories,
+    goals,
+    history,
+    historyPeriod,
+    historySeries,
+    summaryCards,
+    transactions,
+  } =
+    await getDashboardData("mock-user", historyOptions);
   const goalHighlight = getGoalHighlight(goals);
 
   return (
@@ -140,7 +176,11 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.95fr)]">
-        <HistoryChart data={history} />
+        <HistoryChart
+          data={history}
+          period={historyPeriod}
+          series={historySeries}
+        />
         <RecentTransactionsCard transactions={transactions} />
       </section>
 

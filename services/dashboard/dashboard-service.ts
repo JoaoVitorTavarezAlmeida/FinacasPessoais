@@ -8,13 +8,17 @@ import type {
   CreateGoalInput,
   CreateTransactionInput,
   DashboardData,
+  DashboardQueryOptions,
   UpdateCategoryInput,
   UpdateGoalInput,
   UpdateTransactionInput,
 } from "@/types/dashboard";
 
 export type DashboardService = {
-  getDashboardData(userId: string): Promise<DashboardData>;
+  getDashboardData(
+    userId: string,
+    options?: DashboardQueryOptions,
+  ): Promise<DashboardData>;
   createCategory(input: CreateCategoryInput, userId: string): Promise<void>;
   updateCategory(input: UpdateCategoryInput, userId: string): Promise<void>;
   deleteCategory(id: string, userId: string): Promise<void>;
@@ -37,8 +41,8 @@ const dashboardRepository = hasDatabaseUrl()
   : mockDashboardRepository;
 
 export const mockDashboardService: DashboardService = {
-  async getDashboardData(userId) {
-    return dashboardRepository.getDashboardData(userId);
+  async getDashboardData(userId, options) {
+    return dashboardRepository.getDashboardData(userId, options);
   },
 
   async createCategory(input, userId) {

@@ -103,13 +103,13 @@ export function TransactionFilters({
 
         <div className="flex flex-col items-stretch gap-2 sm:col-span-2 sm:flex-row sm:items-end xl:col-span-3 xl:justify-end">
           <button
-            className="h-12 rounded-2xl bg-slate-950 px-4 text-sm font-semibold text-white sm:min-w-[112px]"
+            className="inline-flex h-12 items-center justify-center whitespace-nowrap rounded-2xl bg-slate-950 px-4 text-center text-sm font-semibold text-white sm:min-w-[112px]"
             type="submit"
           >
             Aplicar
           </button>
           <a
-            className="inline-flex h-12 items-center justify-center rounded-2xl border border-slate-200 px-4 text-sm font-medium text-slate-700 sm:min-w-[112px]"
+            className="inline-flex h-12 items-center justify-center whitespace-nowrap rounded-2xl border border-slate-200 px-4 text-center text-sm font-medium text-slate-700 sm:min-w-[112px]"
             href="/transactions"
           >
             Limpar

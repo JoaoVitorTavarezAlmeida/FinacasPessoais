@@ -19,7 +19,7 @@ export function RecentTransactionsCard({
           </h3>
         </div>
         <Link
-          className="rounded-2xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700"
+          className="inline-flex min-w-[110px] items-center justify-center whitespace-nowrap rounded-2xl border border-slate-200 px-4 py-2 text-center text-sm font-medium text-slate-700"
           href="/transactions"
         >
           Ver página

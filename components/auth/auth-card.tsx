@@ -46,9 +46,9 @@ export function AuthCard() {
           : "Acesse sua dashboard financeira e acompanhe o fluxo do mes."}
       </p>
 
-      <div className="mt-6 grid grid-cols-2 rounded-2xl bg-slate-100 p-1">
+      <div className="mt-6 grid grid-cols-2 gap-1 rounded-2xl bg-slate-100 p-1">
         <button
-          className={`rounded-xl px-4 py-2 text-sm font-medium ${
+          className={`min-w-0 rounded-xl px-3 py-2 text-center text-sm font-medium leading-tight ${
             !isSignUp ? "bg-white text-slate-950 shadow-sm" : "text-slate-500"
           }`}
           onClick={() => setMode("sign-in")}
@@ -57,7 +57,7 @@ export function AuthCard() {
           Entrar
         </button>
         <button
-          className={`rounded-xl px-4 py-2 text-sm font-medium ${
+          className={`min-w-0 rounded-xl px-3 py-2 text-center text-sm font-medium leading-tight ${
             isSignUp ? "bg-white text-slate-950 shadow-sm" : "text-slate-500"
           }`}
           onClick={() => setMode("sign-up")}
@@ -117,7 +117,7 @@ export function AuthCard() {
         ) : null}
 
         <button
-          className="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white"
+          className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-950 px-4 py-3 text-center text-sm font-semibold text-white"
           disabled={isSignUp ? signUpPending : signInPending}
           type="submit"
         >
